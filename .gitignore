@@ -66,6 +66,12 @@ artifacts/
 # ASP.NET Scaffolding
 ScaffoldingReadMe.txt
 
+# Application runtime data
+GameStore.API/Database/*
+!GameStore.API/Database/.gitkeep
+GameStore.API/logs/*
+!GameStore.API/logs/.gitkeep
+
 # StyleCop
 StyleCopReport.xml
 

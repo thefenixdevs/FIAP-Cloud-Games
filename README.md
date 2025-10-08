@@ -1,1 +1,909 @@
-# GameStore
+# FIAP Cloud Games
+
+<p align="center">
+  <img src="https://img.shields.io/badge/.NET-9.0-512BD4?style=for-the-badge&logo=dotnet" alt=".NET 9.0"/>
+  <img src="https://img.shields.io/badge/Entity_Framework-Core-512BD4?style=for-the-badge&logo=microsoft" alt="EF Core"/>
+  <img src="https://img.shields.io/badge/SQLite-Database-003B57?style=for-the-badge&logo=sqlite" alt="SQLite"/>
+  <img src="https://img.shields.io/badge/JWT-Authentication-000000?style=for-the-badge&logo=jsonwebtokens" alt="JWT"/>
+  <img src="https://img.shields.io/badge/xUnit-Testing-5E2D79?style=for-the-badge" alt="xUnit"/>
+  <a href="https://github.com/thefenixdevs/FIAP-Cloud-Games/releases/latest"><img src="https://img.shields.io/github/v/release/thefenixdevs/FIAP-Cloud-Games?style=for-the-badge&label=Release&logo=github" alt="Release badge"/></a>
+  <a href="https://github.com/thefenixdevs/FIAP-Cloud-Games/actions/workflows/ci.yml"><img src="https://img.shields.io/github/actions/workflow/status/thefenixdevs/FIAP-Cloud-Games/ci.yml?style=for-the-badge&label=CI&logo=github" alt="CI badge"/></a>
+</p>
+
+## 📋 Índice
+
+- [Sobre o Projeto](#sobre-o-projeto)
+- [Origem e Evolução](#origem-e-evolução)
+- [Visão Geral](#visão-geral)
+- [Princípios Arquiteturais](#princípios-arquiteturais)
+- [Estrutura de Pastas](#estrutura-de-pastas)
+- [Tecnologias e Ferramentas](#tecnologias-e-ferramentas)
+- [Módulos de Negócio](#módulos-de-negócio)
+- [Estratégia de Banco de Dados](#estratégia-de-banco-de-dados)
+- [Estratégia de Testes](#estratégia-de-testes)
+- [Como Executar o Projeto](#como-executar-o-projeto)
+- [Configuração](#configuração)
+- [Endpoints da API](#endpoints-da-api)
+- [Publicação e Releases](#publicação-e-releases)
+- [Contribuindo](#contribuindo)
+
+---
+
+## 🎮 Sobre o Projeto
+
+**FIAP Cloud Games** é uma plataforma de gestão de jogos digitais desenvolvida como projeto acadêmico para o Tech Challenge da FIAP. O sistema demonstra a aplicação prática de conceitos avançados de arquitetura de software, utilizando .NET 9 com Clean Architecture, Domain-Driven Design (DDD) e padrões modernos de desenvolvimento.
+
+A aplicação oferece um ecossistema completo para gerenciamento de catálogos de jogos digitais, incluindo autenticação segura, autorização baseada em perfis, auditoria de requisições e persistência de dados robusta.
+
+### 🎯 Objetivos do Projeto
+
+- Demonstrar a aplicação de **Clean Architecture** e **DDD** em ambiente .NET
+- Implementar autenticação e autorização robustas com **JWT**
+- Aplicar padrões de design como **Repository**, **Unit of Work** e **Dependency Injection**
+- Garantir qualidade através de **testes automatizados** em múltiplas camadas
+- Utilizar **Entity Framework Core** com abordagem Code-First
+- Implementar **logging estruturado** e **rastreabilidade de requisições**
+
+---
+
+## 🔄 Origem e Evolução
+
+Este projeto é uma **evolução** da prova de conceito (PoC) desenvolvida no repositório [TechChallengeGameStore](https://github.com/thefenixdevs/TechChallengeGameStore), especificamente do caminho **ProofsOfConcepts/v12**.
+
+A versão atual representa um refinamento arquitetural significativo, incorporando:
+
+- ✅ Migração completa para **.NET 9**
+- ✅ Refatoração para **Clean Architecture** pura
+- ✅ Implementação de **políticas de autorização customizadas**
+- ✅ **Middleware de CorrelationId** para rastreabilidade
+- ✅ **Seeding automatizado** de dados iniciais
+- ✅ **Cobertura de testes** expandida (unitários e de integração)
+- ✅ **Logging estruturado** com Serilog
+
+---
+
+## 🔍 Visão Geral
+
+O **FIAP Cloud Games** é estruturado em camadas bem definidas, seguindo os princípios da Clean Architecture:
+
+```
+┌─────────────────────────────────────────────┐
+│         GameStore.API (Presentation)        │
+│   Controllers, Middleware, Configuration    │
+└────────────────┬────────────────────────────┘
+                 │
+┌────────────────▼────────────────────────────┐
+│      GameStore.Application (Use Cases)      │
+│     Services, DTOs, Business Logic          │
+└────────────────┬────────────────────────────┘
+                 │
+┌────────────────▼────────────────────────────┐
+│       GameStore.Domain (Core/Entities)      │
+│  Entities, Value Objects, Interfaces        │
+└────────────────▲────────────────────────────┘
+                 │
+┌────────────────┴────────────────────────────┐
+│   GameStore.Infrastructure (External)       │
+│  Database, Repositories, External Services  │
+└─────────────────────────────────────────────┘
+```
+
+### 📦 Componentes Principais
+
+| Camada | Responsabilidade | Dependências |
+|--------|------------------|--------------|
+| **API** | Apresentação, Controllers, Middlewares | Application, Infrastructure |
+| **Application** | Casos de uso, Serviços de aplicação, DTOs | Domain |
+| **Domain** | Entidades, Regras de negócio, Contratos | Nenhuma (núcleo) |
+| **Infrastructure** | Persistência, Repositórios, Seeders | Domain |
+| **Tests** | Testes unitários e de integração | Todas as camadas |
+
+---
+
+## 🏗️ Princípios Arquiteturais
+
+O projeto foi construído seguindo princípios sólidos de engenharia de software:
+
+### 1. **Clean Architecture**
+- **Separação de responsabilidades** em camadas distintas
+- **Dependências unidirecionais** (sempre apontando para o domínio)
+- **Independência de frameworks** na camada de domínio
+- **Testabilidade** em todos os níveis
+
+### 2. **Domain-Driven Design (DDD)**
+- **Entidades ricas** com comportamento e validações
+- **Value Objects** para conceitos de domínio
+- **Agregados** para manter consistência de dados
+- **Repositórios** como abstração de persistência
+
+### 3. **SOLID Principles**
+- **S**ingle Responsibility: Cada classe tem uma única responsabilidade
+- **O**pen/Closed: Extensível sem modificação
+- **L**iskov Substitution: Interfaces bem definidas
+- **I**nterface Segregation: Contratos específicos por necessidade
+- **D**ependency Inversion: Dependência de abstrações, não de implementações
+
+### 4. **Separation of Concerns**
+- Lógica de negócio isolada da infraestrutura
+- Validações no domínio
+- DTOs para transferência de dados entre camadas
+- Mapeamento explícito de responsabilidades
+
+### 5. **Dependency Injection**
+- Injeção de dependência nativa do .NET
+- Registro modular por camada (`AddApplication()`, `AddInfrastructure()`)
+- Gerenciamento automático de ciclo de vida
+
+---
+
+## 📁 Estrutura de Pastas
+
+```
+FIAP-Cloud-Games/
+│
+├── 📄 GameStore.sln                    # Solução principal
+├── 📄 GameStore.slnx                   # Arquivo de solução alternativo
+├── 📄 global.json                      # Definição de versão do SDK .NET
+├── 📄 LICENSE.txt                      # Licença do projeto
+├── 📄 README.md                        # Este arquivo
+│
+├── 🎯 GameStore.API/                   # Camada de Apresentação
+│   ├── Controllers/                    # Endpoints REST
+│   │   ├── AuthController.cs           # Autenticação e registro
+│   │   └── GamesController.cs          # CRUD de jogos
+│   ├── Authorization/                  # Políticas de autorização customizadas
+│   │   ├── ConfirmedAdminHandler.cs
+│   │   ├── ConfirmedAdminRequirement.cs
+│   │   ├── ConfirmedCommonUserHandler.cs
+│   │   └── ConfirmedCommonUserRequirement.cs
+│   ├── Middleware/                     # Middlewares customizados
+│   │   └── CorrelationIdMiddleware.cs  # Rastreamento de requisições
+│   ├── Database/                       # Banco de dados SQLite
+│   │   └── gamestore.db
+│   ├── logs/                           # Logs da aplicação (Serilog)
+│   ├── Properties/
+│   │   └── launchSettings.json         # Configurações de execução
+│   ├── Program.cs                      # Bootstrapping da aplicação
+│   ├── appsettings.json                # Configurações gerais
+│   └── appsettings.Development.json    # Configurações de desenvolvimento
+│
+├── 💼 GameStore.Application/           # Camada de Aplicação
+│   ├── Services/                       # Serviços de aplicação
+│   │   ├── AuthService.cs              # Lógica de autenticação
+│   │   ├── GameService.cs              # Lógica de gestão de jogos
+│   │   ├── JwtService.cs               # Geração e validação de tokens
+│   │   ├── IAuthService.cs
+│   │   ├── IGameService.cs
+│   │   └── IJwtService.cs
+│   ├── DTOs/                           # Data Transfer Objects
+│   │   ├── AuthDTOs.cs                 # DTOs de autenticação
+│   │   └── GameDTOs.cs                 # DTOs de jogos
+│   └── DependencyInjection.cs          # Registro de serviços
+│
+├── 🔷 GameStore.Domain/                # Camada de Domínio (Core)
+│   ├── Entities/                       # Entidades de domínio
+│   │   ├── BaseEntity.cs               # Entidade base (Id, timestamps)
+│   │   ├── User.cs                     # Entidade de usuário
+│   │   └── Game.cs                     # Entidade de jogo
+│   ├── Enums/                          # Enumerações do domínio
+│   │   ├── AccountStatus.cs            # Status da conta (Pending, Confirmed, Banned)
+│   │   └── ProfileType.cs              # Tipo de perfil (CommonUser, Admin)
+│   └── Repositories/                   # Contratos de repositórios
+│       ├── IGameRepository.cs
+│       ├── IUserRepository.cs
+│       └── Abstractions/
+│           └── IUnitOfWork.cs
+│
+├── 🗄️ GameStore.Infrastructure/        # Camada de Infraestrutura
+│   ├── Data/                           # Contexto e configurações EF Core
+│   │   ├── GameStoreContext.cs         # DbContext principal
+│   │   ├── Configurations/             # Fluent API configurations
+│   │   ├── Seeders/                    # Seeders de dados iniciais
+│   │   │   ├── Abstractions/
+│   │   │   │   └── IDataSeeder.cs
+│   │   │   ├── Users/
+│   │   │   │   └── UserSeeder.cs       # Seeder de usuário admin
+│   │   │   └── DataSeederOrchestrator.cs
+│   │   └── Initialization/             # Inicialização do banco
+│   ├── Migrations/                     # Migrations do EF Core
+│   ├── Repositories/                   # Implementações de repositórios
+│   │   ├── Games/
+│   │   │   └── GameRepository.cs
+│   │   ├── Users/
+│   │   │   └── UserRepository.cs
+│   │   └── Abstractions/
+│   │       └── UnitOfWork.cs
+│   └── DependencyInjection.cs          # Registro de infraestrutura
+│
+└── 🧪 GameStore.Tests/                 # Camada de Testes
+    ├── API/                            # Testes de controllers e middleware
+    │   ├── Authorization/
+    │   └── Middleware/
+    ├── Application/                    # Testes de serviços
+    │   └── Services/
+    ├── Infrastructure/                 # Testes de repositórios
+    │   └── Repositories/
+    └── Usings.cs                       # Usings globais para testes
+```
+
+### 🎯 Objetivo de Cada Camada
+
+#### **GameStore.API** (Apresentação)
+- **O que faz:** Ponto de entrada da aplicação, expõe endpoints REST
+- **Como funciona:** Recebe requisições HTTP, valida JWT, aplica autorização e delega para Application
+- **O que pode conter:**
+  - Controllers (endpoints)
+  - Middlewares (CorrelationId, Exception Handling)
+  - Políticas de autorização customizadas
+  - Configuração de Swagger/OpenAPI
+  - Bootstrapping e configuração de DI
+
+#### **GameStore.Application** (Casos de Uso)
+- **O que faz:** Orquestra a lógica de negócio e coordena operações
+- **Como funciona:** Implementa casos de uso, valida DTOs, aplica regras de negócio e coordena repositórios
+- **O que pode conter:**
+  - Serviços de aplicação (AuthService, GameService)
+  - DTOs (RegisterDto, LoginDto, GameDto)
+  - Mapeamento de entidades ↔ DTOs
+  - Validações de entrada
+  - Coordenação de transações (via UnitOfWork)
+
+#### **GameStore.Domain** (Núcleo)
+- **O que faz:** Define o modelo de domínio e regras de negócio puras
+- **Como funciona:** Entidades ricas com comportamento, sem dependências externas
+- **O que pode conter:**
+  - Entidades (User, Game)
+  - Value Objects
+  - Enums (AccountStatus, ProfileType)
+  - Interfaces de repositórios (contratos)
+  - Exceções de domínio
+  - **NÃO** contém dependências de frameworks ou bibliotecas externas
+
+#### **GameStore.Infrastructure** (Persistência e Serviços Externos)
+- **O que faz:** Implementa detalhes técnicos de infraestrutura
+- **Como funciona:** Implementa repositórios, gerencia banco de dados, seeders
+- **O que pode conter:**
+  - DbContext (Entity Framework Core)
+  - Implementações de repositórios
+  - Configurações Fluent API
+  - Migrations
+  - Seeders de dados
+  - Integrações com serviços externos
+
+#### **GameStore.Tests** (Testes Automatizados)
+- **O que faz:** Garante qualidade e funcionamento correto do sistema
+- **Como funciona:** Testes unitários e de integração usando xUnit, Moq e EF InMemory
+- **O que pode conter:**
+  - Testes de serviços (Application)
+  - Testes de repositórios (Infrastructure)
+  - Testes de controllers (API)
+  - Testes de middleware
+  - Fixtures e mocks
+
+---
+
+## 🛠️ Tecnologias e Ferramentas
+
+### **Framework e Runtime**
+- **.NET 9.0** - Framework principal
+- **C# 12** - Linguagem de programação
+- **ASP.NET Core 9.0** - Web API framework
+
+### **Banco de Dados e ORM**
+- **SQLite** - Banco de dados relacional leve
+- **Entity Framework Core 9.0** - ORM (Object-Relational Mapping)
+- **EF Core Design** - Ferramentas de design-time para migrations
+- **EF Core Tools** - CLI para gerenciamento de banco de dados
+
+### **Autenticação e Segurança**
+- **JWT (JSON Web Tokens)** - Autenticação stateless
+- **BCrypt.Net-Next** - Hashing seguro de senhas
+- **Microsoft.AspNetCore.Authentication.JwtBearer** - Middleware JWT
+
+### **Logging e Observabilidade**
+- **Serilog** - Logging estruturado
+- **Serilog.AspNetCore** - Integração com ASP.NET Core
+- **Serilog.Sinks.Console** - Output para console
+- **Serilog.Sinks.File** - Output para arquivo (rolling logs)
+
+### **Testes**
+- **xUnit** - Framework de testes unitários
+- **Moq** - Biblioteca de mocking
+- **FluentAssertions** - Asserções expressivas
+- **EF Core InMemory** - Provider em memória para testes
+
+### **Documentação**
+- **Swagger/OpenAPI** - Documentação interativa da API
+- **Swashbuckle.AspNetCore** - Geração automática de documentação
+
+### **Ferramentas de Desenvolvimento**
+- **Visual Studio 2022** / **VS Code** - IDEs
+- **Git** - Controle de versão
+- **PowerShell** - Scripts e automação
+
+### **Padrões e Bibliotecas**
+- **AutoMapper** (opcional/futuro) - Mapeamento objeto-objeto
+- **FluentValidation** (opcional/futuro) - Validações fluentes
+- **MediatR** (opcional/futuro) - CQRS e mediação
+
+---
+
+## 💼 Módulos de Negócio
+
+### 1. **Módulo de Autenticação e Autorização**
+
+#### Funcionalidades
+- ✅ **Registro de usuários** com validação de e-mail único
+- ✅ **Login** com geração de JWT
+- ✅ **Hashing de senhas** com BCrypt (10 rounds)
+- ✅ **Gestão de perfis**: CommonUser e Admin
+- ✅ **Gestão de status de conta**: Pending, Confirmed, Banned
+
+#### Regras de Negócio
+- Novos usuários começam com status `Pending`
+- Senhas são sempre hasheadas antes de persistir
+- E-mail e username devem ser únicos
+- JWT expira em 60 minutos (configurável)
+
+#### Entidades Envolvidas
+- `User` (Id, Name, Email, Username, PasswordHash, ProfileType, AccountStatus)
+
+#### Serviços
+- `IAuthService` / `AuthService` - Lógica de autenticação
+- `IJwtService` / `JwtService` - Geração e validação de tokens
+
+---
+
+### 2. **Módulo de Gestão de Jogos**
+
+#### Funcionalidades
+- ✅ **Listagem de jogos** (todos os usuários confirmados)
+- ✅ **Consulta por ID** (todos os usuários confirmados)
+- ✅ **Criação de jogos** (somente Admins confirmados)
+- ✅ **Atualização de jogos** (somente Admins confirmados)
+- ✅ **Exclusão de jogos** (somente Admins confirmados)
+
+#### Regras de Negócio
+- Apenas usuários com `AccountStatus.Confirmed` podem acessar jogos
+- Apenas usuários com `ProfileType.Admin` podem criar/editar/deletar
+- Título do jogo é obrigatório
+- Preço não pode ser negativo
+- Data de lançamento é opcional
+
+#### Entidades Envolvidas
+- `Game` (Id, Title, Description, Price, Genre, ReleaseDate)
+
+#### Serviços
+- `IGameService` / `GameService` - Lógica de gestão de jogos
+
+---
+
+### 3. **Módulo de Rastreabilidade**
+
+#### Funcionalidades
+- ✅ **CorrelationId** em todas as requisições
+- ✅ **Logging estruturado** com contexto de requisição
+- ✅ **Logs persistidos em arquivo** (rolling daily)
+
+#### Como Funciona
+1. Middleware `CorrelationIdMiddleware` intercepta requisição
+2. Gera ou extrai `X-Correlation-Id` do header
+3. Injeta no contexto HTTP
+4. Logger inclui CorrelationId em todos os logs
+5. Response retorna o mesmo CorrelationId
+
+---
+
+## 🗄️ Estratégia de Banco de Dados
+
+### **Abordagem: Code-First com Entity Framework Core**
+
+O projeto utiliza a abordagem **Code-First**, onde as entidades de domínio são definidas em C# e o banco de dados é gerado automaticamente a partir delas.
+
+### **Banco de Dados: SQLite**
+
+**Por que SQLite?**
+- ✅ Zero configuração para desenvolvimento local
+- ✅ Arquivo único (`gamestore.db`)
+- ✅ Portável entre ambientes
+- ✅ Suficiente para aplicação de porte médio
+- ✅ Facilita testes e demonstrações
+
+**Para produção:** Substituir por PostgreSQL, SQL Server ou MySQL com mínima alteração de código.
+
+### **Configuração de Entidades**
+
+As configurações são aplicadas via **Fluent API** em classes dedicadas:
+
+```
+GameStore.Infrastructure/Data/Configurations/
+├── UserConfiguration.cs      # Configuração da entidade User
+└── GameConfiguration.cs      # Configuração da entidade Game
+```
+
+**Características:**
+- Primary keys configuradas
+- Índices únicos (Email, Username)
+- Relacionamentos definidos
+- Restrições de campo (Required, MaxLength)
+- Conversões de enums
+
+### **Migrations**
+
+Gerenciamento de evolução do schema:
+
+```powershell
+# Criar nova migration
+dotnet ef migrations add NomeDaMigracao --project GameStore.Infrastructure --startup-project GameStore.API
+
+# Aplicar migrations ao banco
+dotnet ef database update --project GameStore.Infrastructure --startup-project GameStore.API
+
+# Reverter migration
+dotnet ef migrations remove --project GameStore.Infrastructure --startup-project GameStore.API
+```
+
+### **Seeders (Dados Iniciais)**
+
+O projeto utiliza um sistema de **seeders orquestrados** para popular dados iniciais:
+
+#### **Arquitetura de Seeders**
+
+```
+IDataSeeder (Interface)
+    ↓
+DataSeederOrchestrator (Orquestrador)
+    ↓
+UserSeeder (Implementação)
+```
+
+#### **UserSeeder**
+Cria usuário administrador padrão:
+- **Email:** `admin@gamestore.com`
+- **Username:** `admin`
+- **Senha:** `Admin@123` (hasheada)
+- **Perfil:** Admin
+- **Status:** Confirmed
+
+#### **Como Funciona**
+1. `Program.cs` registra seeders no DI
+2. Durante inicialização, `DataSeederOrchestrator` é executado
+3. Migrations são aplicadas automaticamente
+4. Seeders são executados em ordem
+5. Dados são criados somente se não existirem (idempotente)
+
+### **Unit of Work Pattern**
+
+Coordenação de transações entre repositórios:
+
+```csharp
+public interface IUnitOfWork
+{
+    Task<int> SaveChangesAsync();
+    Task BeginTransactionAsync();
+    Task CommitTransactionAsync();
+    Task RollbackTransactionAsync();
+}
+```
+
+**Benefícios:**
+- ✅ Controle explícito de transações
+- ✅ Atomicidade de operações
+- ✅ Isolamento de lógica de persistência
+
+---
+
+## 🧪 Estratégia de Testes
+
+### **Filosofia de Testes**
+
+O projeto adota uma estratégia de **pirâmide de testes**, priorizando:
+
+```
+           /\
+          /  \  E2E (Poucos)
+         /    \
+        /------\  Integration (Médio)
+       /        \
+      /----------\  Unit (Muitos)
+     /______________\
+```
+
+### **Frameworks e Bibliotecas**
+
+- **xUnit** - Framework de testes (convenção .NET)
+- **Moq** - Criação de mocks e stubs
+- **FluentAssertions** - Asserções legíveis
+- **EF Core InMemory** - Banco em memória para testes de repositório
+
+### **Categorias de Testes**
+
+#### **1. Testes Unitários (Unit Tests)**
+
+**Objetivo:** Testar componentes isolados sem dependências externas
+
+**Localização:** `GameStore.Tests/Application/Services/`
+
+**Escopo:**
+- Serviços de aplicação (AuthService, GameService, JwtService)
+- Lógica de negócio isolada
+- Validações de entrada
+- Tratamento de erros
+
+**Exemplo de Cenários:**
+- ✅ `AuthService.RegisterAsync` com e-mail duplicado deve lançar exceção
+- ✅ `AuthService.LoginAsync` com senha incorreta deve retornar null
+- ✅ `JwtService.GenerateToken` deve gerar token válido
+- ✅ `GameService.CreateAsync` sem permissão Admin deve falhar
+
+**Técnicas:**
+- **Mocking** de repositórios com Moq
+- **Arrange-Act-Assert** pattern
+- **Testes parametrizados** (Theory/InlineData)
+- **Fixtures** para dados de teste
+
+---
+
+#### **2. Testes de Integração (Integration Tests)**
+
+**Objetivo:** Testar interação entre componentes reais (com banco em memória)
+
+**Localização:** `GameStore.Tests/Infrastructure/Repositories/`
+
+**Escopo:**
+- Repositórios + EF Core
+- Operações de persistência
+- Queries complexas
+- Validações de restrições de banco
+
+**Exemplo de Cenários:**
+- ✅ `UserRepository.AddAsync` deve persistir usuário corretamente
+- ✅ `GameRepository.GetByIdAsync` deve retornar jogo existente
+- ✅ `UnitOfWork.SaveChangesAsync` deve aplicar transações
+- ✅ Índice único de e-mail deve prevenir duplicação
+
+**Técnicas:**
+- **InMemory Database Provider** (EF Core)
+- **DbContext** isolado por teste
+- **Transações de teste** (rollback automático)
+
+---
+
+#### **3. Testes de Middleware**
+
+**Objetivo:** Validar comportamento de middlewares customizados
+
+**Localização:** `GameStore.Tests/API/Middleware/`
+
+**Escopo:**
+- `CorrelationIdMiddleware`
+- Propagação de headers
+- Logging contextual
+
+**Exemplo de Cenários:**
+- ✅ Middleware deve gerar CorrelationId se ausente
+- ✅ Middleware deve preservar CorrelationId do request
+- ✅ Response deve incluir header `X-Correlation-Id`
+
+---
+
+#### **4. Testes de Autorização**
+
+**Objetivo:** Validar políticas de autorização customizadas
+
+**Localização:** `GameStore.Tests/API/Authorization/`
+
+**Escopo:**
+- `ConfirmedCommonUserHandler`
+- `ConfirmedAdminHandler`
+- Validação de claims JWT
+
+**Exemplo de Cenários:**
+- ✅ Handler deve autorizar usuário confirmado
+- ✅ Handler deve negar usuário pendente
+- ✅ Handler deve validar perfil Admin
+
+---
+
+### **Cobertura de Testes (Overview)**
+
+| Camada | Tipo | Foco | Quantidade Aproximada |
+|--------|------|------|----------------------|
+| Application | Unitário | Serviços, DTOs | ~30 testes |
+| Infrastructure | Integração | Repositórios, UoW | ~20 testes |
+| API | Middleware | CorrelationId | ~5 testes |
+| API | Autorização | Handlers customizados | ~10 testes |
+
+**Meta de Cobertura:** 70%+ de cobertura de código nas camadas críticas (Application e Domain)
+
+---
+
+### **Boas Práticas Adotadas**
+
+1. ✅ **AAA Pattern** (Arrange-Act-Assert)
+2. ✅ **Testes independentes** (sem ordem de execução)
+3. ✅ **Nomes descritivos** (MethodName_Scenario_ExpectedBehavior)
+4. ✅ **One assertion per test** (quando possível)
+5. ✅ **Fixtures reutilizáveis** para dados de teste
+6. ✅ **Cleanup automático** (Dispose de contextos)
+
+---
+
+### **Executando os Testes**
+
+```powershell
+# Executar todos os testes
+dotnet test GameStore.sln
+
+# Executar com detalhamento
+dotnet test GameStore.sln --logger "console;verbosity=detailed"
+
+# Executar testes de uma categoria específica
+dotnet test --filter "FullyQualifiedName~Application"
+
+# Gerar relatório de cobertura
+dotnet test /p:CollectCoverage=true /p:CoverletOutputFormat=opencover
+```
+
+---
+
+## 🚀 Como Executar o Projeto
+
+### **Pré-requisitos**
+
+Certifique-se de ter instalado:
+
+1. **.NET 9.0 SDK** - [Download](https://dotnet.microsoft.com/download/dotnet/9.0)
+   ```powershell
+   dotnet --version  # Deve retornar 9.0.x
+   ```
+
+2. **Git** - [Download](https://git-scm.com/downloads)
+
+3. **Editor de código** (Visual Studio 2022, VS Code ou JetBrains Rider)
+
+---
+
+### **Passo 1: Clonar o Repositório**
+
+```powershell
+# Clone o repositório
+git clone https://github.com/thefenixdevs/FIAP-Cloud-Games.git
+
+# Navegue até o diretório
+cd FIAP-Cloud-Games
+```
+
+---
+
+### **Passo 2: Restaurar Dependências**
+
+```powershell
+# Restaurar pacotes NuGet
+dotnet restore GameStore.sln
+```
+
+---
+
+### **Passo 3: Aplicar Migrations (Criar Banco de Dados)**
+
+```powershell
+# Executar migrations para criar o banco SQLite
+dotnet ef database update --project GameStore.Infrastructure --startup-project GameStore.API
+```
+
+**Nota:** O banco será criado em `GameStore.API/Database/gamestore.db`
+
+---
+
+### **Passo 4: Executar a Aplicação**
+
+```powershell
+# Executar a API
+dotnet run --project GameStore.API/GameStore.API.csproj
+```
+
+**Saída esperada:**
+```
+info: Microsoft.Hosting.Lifetime[14]
+      Now listening on: https://localhost:7001
+info: Microsoft.Hosting.Lifetime[0]
+      Application started. Press Ctrl+C to shut down.
+```
+
+---
+
+### **Passo 5: Acessar o Swagger UI**
+
+Abra seu navegador e acesse:
+
+```
+https://localhost:7001/swagger
+```
+
+Você verá a documentação interativa da API com todos os endpoints disponíveis.
+
+---
+
+### **Passo 6: Testar a API**
+
+#### **1. Registrar um novo usuário**
+
+```http
+POST https://localhost:7001/api/auth/register
+Content-Type: application/json
+
+{
+  "email": "usuario@example.com",
+  "username": "usuario",
+  "password": "Senha@123"
+}
+```
+
+#### **2. Login (obter JWT)**
+
+```http
+POST https://localhost:7001/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "admin@gamestore.com",
+  "password": "Admin@123"
+}
+```
+
+**Resposta:**
+```json
+{
+  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+  "expiresAt": "2025-10-08T15:30:00Z"
+}
+```
+
+#### **3. Listar jogos (com autenticação)**
+
+```http
+GET https://localhost:7001/api/games
+Authorization: Bearer SEU_TOKEN_AQUI
+```
+
+---
+
+### **Executar Testes**
+
+```powershell
+# Executar todos os testes
+dotnet test GameStore.sln
+
+# Executar com relatório detalhado
+dotnet test GameStore.sln --logger "console;verbosity=detailed"
+```
+
+---
+
+## ⚙️ Configuração
+
+### **appsettings.json**
+
+Localização: `GameStore.API/appsettings.json`
+
+```json
+{
+  "ConnectionStrings": {
+    "DefaultConnection": "Data Source=Database\\gamestore.db"
+  },
+  "Jwt": {
+    "SecretKey": "YourSuperSecretKeyForJWTTokenGeneration123456",
+    "Issuer": "GameStore",
+    "Audience": "GameStoreApiUsers",
+    "ExpirationInMinutes": 60
+  },
+  "Logging": {
+    "LogLevel": {
+      "Default": "Information",
+      "Microsoft.AspNetCore": "Warning"
+    }
+  }
+}
+```
+
+### **Configurações Importantes**
+
+| Configuração | Descrição | Valor Padrão |
+|--------------|-----------|--------------|
+| `ConnectionStrings:DefaultConnection` | String de conexão SQLite | `Data Source=Database\\gamestore.db` |
+| `Jwt:SecretKey` | Chave secreta para assinar JWT | (Alterar em produção!) |
+| `Jwt:Issuer` | Emissor do token | `GameStore` |
+| `Jwt:Audience` | Audiência do token | `GameStoreApiUsers` |
+| `Jwt:ExpirationInMinutes` | Tempo de expiração do token | `60` minutos |
+
+**⚠️ IMPORTANTE:** Em produção:
+- Altere `Jwt:SecretKey` para uma chave forte (min. 32 caracteres)
+- Use **variáveis de ambiente** ou **Azure Key Vault** para secrets
+- Configure HTTPS com certificado válido
+
+---
+
+## 🔌 Endpoints da API
+
+### **Autenticação**
+
+| Método | Endpoint | Descrição | Autorização |
+|--------|----------|-----------|-------------|
+| POST | `/api/auth/register` | Registrar novo usuário | Não requerida |
+| POST | `/api/auth/login` | Autenticar e obter JWT | Não requerida |
+
+### **Jogos**
+
+| Método | Endpoint | Descrição | Autorização |
+|--------|----------|-----------|-------------|
+| GET | `/api/games` | Listar todos os jogos | ConfirmedCommonUser |
+| GET | `/api/games/{id}` | Obter jogo por ID | ConfirmedCommonUser |
+| POST | `/api/games` | Criar novo jogo | ConfirmedAdmin |
+| PUT | `/api/games/{id}` | Atualizar jogo | ConfirmedAdmin |
+| DELETE | `/api/games/{id}` | Excluir jogo | ConfirmedAdmin |
+
+---
+
+## 🚀 Publicação e Releases
+
+### 📌 Versionamento e release 0.2.0
+- Versionamento semântico centralizado em [`Directory.Build.props`](./Directory.Build.props) (`0.2.0`).
+- Notas oficiais em [`RELEASE_NOTES.md`](./RELEASE_NOTES.md).
+- Para gerar nova release:
+  1. Garanta que a branch `master`/`main` esteja atualizada.
+  2. Crie a tag semântica (`git tag v0.2.0 && git push origin v0.2.0`).
+  3. A workflow [`release.yml`](.github/workflows/release.yml) cria a release, publica o artefato ZIP e reutiliza o conteúdo das notas.
+
+### 🔄 Integração Contínua
+- Workflow [`ci.yml`](.github/workflows/ci.yml) roda `dotnet restore ➜ build ➜ test` em todo push/pull request.
+- Cobertura coletada via `XPlat Code Coverage` nos artefatos da execução.
+
+### 🌐 Página de demonstração
+- Conteúdo estático pronto em [`docs/`](./docs/) para uso com **GitHub Pages**.
+- Para ativar: *Settings ▸ Pages ▸ Branch: `master` (ou `main`) /docs*.
+- Página inclui instruções de execução, credenciais seedadas e links de download.
+- Documentação Swagger pronta em [`docs/swagger/index.html`](./docs/swagger/index.html); após publicar via GitHub Pages, acesse `/swagger/` para navegar na UI interativa.
+
+### ✅ Checklist pré-release sugerido
+- [ ] Atualizar `RELEASE_NOTES.md` com mudanças recentes.
+- [ ] Garantir que a pipeline de CI esteja verde.
+- [ ] Revisar configurações sensíveis (`appsettings*.json`) antes da publicação.
+- [ ] Se necessário, anexar scripts de migração ou dumps de banco na release.
+
+---
+
+## 🤝 Contribuindo
+
+Contribuições são bem-vindas! Para contribuir:
+
+1. Fork o projeto
+2. Crie uma branch para sua feature (`git checkout -b feature/AmazingFeature`)
+3. Commit suas mudanças (`git commit -m 'Add some AmazingFeature'`)
+4. Push para a branch (`git push origin feature/AmazingFeature`)
+5. Abra um Pull Request
+
+---
+
+## 📄 Licença
+
+Este projeto está sob a licença especificada no arquivo `LICENSE.txt`.
+
+---
+
+## 👥 Equipe
+
+Projeto desenvolvido pela equipe **thefenixdevs** como parte do Tech Challenge FIAP.
+
+---
+
+## 📞 Contato
+
+- **Repositório Original (PoC):** [TechChallengeGameStore](https://github.com/thefenixdevs/TechChallengeGameStore)
+- **Repositório Atual:** [FIAP-Cloud-Games](https://github.com/thefenixdevs/FIAP-Cloud-Games)
+
+---
+
+<p align="center">
+  Desenvolvido com ❤️ pela equipe <strong>thefenixdevs</strong>
+</p>

@@ -1,0 +1,13 @@
+<Project>
+  <PropertyGroup>
+    <VersionPrefix>0.2.0</VersionPrefix>
+    <AssemblyVersion>0.2.0.0</AssemblyVersion>
+    <FileVersion>0.2.0.0</FileVersion>
+    <InformationalVersion>0.2.0</InformationalVersion>
+    <Authors>The Fenix Devs</Authors>
+    <Company>The Fenix Devs</Company>
+    <Product>FIAP Cloud Games</Product>
+    <RepositoryUrl>https://github.com/thefenixdevs/FIAP-Cloud-Games</RepositoryUrl>
+    <PackageProjectUrl>https://github.com/thefenixdevs/FIAP-Cloud-Games</PackageProjectUrl>
+  </PropertyGroup>
+</Project>

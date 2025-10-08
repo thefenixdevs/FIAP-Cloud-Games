@@ -1,14 +1,15 @@
 using GameStore.Domain.Entities;
+using GameStore.Domain.Repositories.Abstractions;
 
 namespace GameStore.Domain.Repositories;
 
-public interface IUserRepository
+/// <summary>
+/// Repository interface for <see cref="User"/> entities.
+/// </summary>
+public interface IUserRepository : IRepository<User>
 {
-    Task<User?> GetByIdAsync(Guid id);
-    Task<User?> GetByEmailAsync(string email);
-    Task<User?> GetByUsernameAsync(string username);
-    Task<bool> ExistsByEmailAsync(string email);
-    Task<bool> ExistsByUsernameAsync(string username);
-    Task AddAsync(User user);
-    Task SaveChangesAsync();
+  Task<User?> GetByEmailAsync(string email);
+  Task<User?> GetByUsernameAsync(string username);
+  Task<bool> ExistsByEmailAsync(string email);
+  Task<bool> ExistsByUsernameAsync(string username);
 }

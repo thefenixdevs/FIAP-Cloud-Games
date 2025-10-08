@@ -1,13 +1,12 @@
 using GameStore.Domain.Entities;
+using GameStore.Domain.Repositories.Abstractions;
 
 namespace GameStore.Domain.Repositories;
 
-public interface IGameRepository
+/// <summary>
+/// Repository interface for <see cref="Game"/> entities.
+/// </summary>
+public interface IGameRepository : IRepository<Game>
 {
-    Task<IEnumerable<Game>> GetAllAsync();
-    Task<Game?> GetByIdAsync(Guid id);
-    Task AddAsync(Game game);
-    Task UpdateAsync(Game game);
-    Task DeleteAsync(Game game);
-    Task SaveChangesAsync();
+  // Place for future Game-specific queries
 }

@@ -1,0 +1,65 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+    inputs:
+      tag_name:
+        description: 'Tag to create (e.g. v0.2.0)'
+        required: false
+      release_name:
+        description: 'Release name override'
+        required: false
+
+jobs:
+  build-and-release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Determine tag for manual dispatch
+        id: release_tag
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ] && [ -n "${{ github.event.inputs.tag_name }}" ]; then
+            echo "tag=${{ github.event.inputs.tag_name }}" >> $GITHUB_OUTPUT
+          else
+            echo "tag=${GITHUB_REF_NAME}" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Setup .NET SDK
+        uses: actions/setup-dotnet@v4
+        with:
+          global-json-file: global.json
+
+      - name: Restore dependencies
+        run: dotnet restore
+
+      - name: Build solution
+        run: dotnet build --configuration Release --no-restore
+
+      - name: Run tests
+        run: dotnet test --configuration Release --no-build
+
+      - name: Publish API
+        run: dotnet publish GameStore.API/GameStore.API.csproj --configuration Release --no-build --output publish
+
+      - name: Create artifacts directory
+        run: mkdir -p artifacts
+
+      - name: Package publish output
+        run: |
+          zip -r artifacts/FIAP-Cloud-Games-${{ steps.release_tag.outputs.tag }}.zip publish
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.release_tag.outputs.tag }}
+          name: ${{ github.event.inputs.release_name || format('FIAP Cloud Games {0}', steps.release_tag.outputs.tag) }}
+          body_path: RELEASE_NOTES.md
+          files: |
+            artifacts/FIAP-Cloud-Games-${{ steps.release_tag.outputs.tag }}.zip

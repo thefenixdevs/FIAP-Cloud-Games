@@ -1,21 +1,20 @@
-using BCrypt.Net;
 using GameStore.Application.DTOs;
 using GameStore.Domain.Entities;
 using GameStore.Domain.Enums;
-using GameStore.Domain.Repositories;
+using GameStore.Domain.Repositories.Abstractions;
 using Microsoft.Extensions.Logging;
 
 namespace GameStore.Application.Services;
 
 public class AuthService : IAuthService
 {
-    private readonly IUserRepository _userRepository;
+    private readonly IUnitOfWork _unitOfWork;
     private readonly IJwtService _jwtService;
     private readonly ILogger<AuthService> _logger;
 
-    public AuthService(IUserRepository userRepository, IJwtService jwtService, ILogger<AuthService> logger)
+    public AuthService(IUnitOfWork unitOfWork, IJwtService jwtService, ILogger<AuthService> logger)
     {
-        _userRepository = userRepository;
+        _unitOfWork = unitOfWork;
         _jwtService = jwtService;
         _logger = logger;
     }
@@ -24,13 +23,13 @@ public class AuthService : IAuthService
     {
         try
         {
-            if (await _userRepository.ExistsByEmailAsync(request.Email))
+            if (await _unitOfWork.Users.ExistsByEmailAsync(request.Email))
             {
                 _logger.LogWarning("Registration failed: Email {Email} already exists", request.Email);
                 return (false, "Email already exists", null);
             }
 
-            if (await _userRepository.ExistsByUsernameAsync(request.Username))
+            if (await _unitOfWork.Users.ExistsByUsernameAsync(request.Username))
             {
                 _logger.LogWarning("Registration failed: Username {Username} already exists", request.Username);
                 return (false, "Username already exists", null);
@@ -39,8 +38,8 @@ public class AuthService : IAuthService
             var passwordHash = BCrypt.Net.BCrypt.HashPassword(request.Password);
             var user = new User(request.Email, request.Username, passwordHash);
 
-            await _userRepository.AddAsync(user);
-            await _userRepository.SaveChangesAsync();
+            await _unitOfWork.Users.AddAsync(user);
+            await _unitOfWork.CommitAsync();
 
             _logger.LogInformation("User {Username} registered successfully with ID {UserId}", user.Username, user.Id);
             return (true, "User registered successfully", user.Id);
@@ -56,7 +55,7 @@ public class AuthService : IAuthService
     {
         try
         {
-            var user = await _userRepository.GetByEmailAsync(request.Email);
+            var user = await _unitOfWork.Users.GetByEmailAsync(request.Email);
 
             if (user == null)
             {

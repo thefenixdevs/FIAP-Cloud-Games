@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="UTF-8" />
+  <title>FIAP Cloud Games · Swagger UI</title>
+  <link rel="stylesheet" href="https://unpkg.com/swagger-ui-dist@5.17.14/swagger-ui.css" />
+  <style>
+    body {
+      margin: 0;
+      background-color: #f2f2f2;
+    }
+
+    .topbar {
+      display: none;
+    }
+
+    #swagger-ui {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 24px;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="swagger-ui"></div>
+
+  <script src="https://unpkg.com/swagger-ui-dist@5.17.14/swagger-ui-bundle.js"></script>
+  <script>
+    window.onload = () => {
+      SwaggerUIBundle({
+        url: 'swagger.json',
+        dom_id: '#swagger-ui',
+        docExpansion: 'list',
+        defaultModelsExpandDepth: 1,
+        defaultModelExpandDepth: 1,
+      });
+    };
+  </script>
+</body>
+
+</html>
