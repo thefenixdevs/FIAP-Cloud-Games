@@ -37,13 +37,13 @@ jobs:
           global-json-file: global.json
 
       - name: Restore dependencies
-        run: dotnet restore
+        run: dotnet restore GameStore.sln
 
       - name: Build solution
-        run: dotnet build --configuration Release --no-restore
+        run: dotnet build GameStore.sln --configuration Release --no-restore
 
       - name: Run tests
-        run: dotnet test --configuration Release --no-build
+        run: dotnet test GameStore.sln --configuration Release --no-build
 
       - name: Publish API
         run: dotnet publish GameStore.API/GameStore.API.csproj --configuration Release --no-build --output publish
