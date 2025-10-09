@@ -27,10 +27,10 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\GameStore.API\GameStore.API.csproj" />
-    <ProjectReference Include="..\GameStore.Application\GameStore.Application.csproj" />
-    <ProjectReference Include="..\GameStore.Domain\GameStore.Domain.csproj" />
-    <ProjectReference Include="..\GameStore.Infrastructure\GameStore.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\src\GameStore.API\GameStore.API.csproj" />
+    <ProjectReference Include="..\..\src\GameStore.Application\GameStore.Application.csproj" />
+    <ProjectReference Include="..\..\src\GameStore.Domain\GameStore.Domain.csproj" />
+    <ProjectReference Include="..\..\src\GameStore.Infrastructure\GameStore.Infrastructure.csproj" />
   </ItemGroup>
 
   <ItemGroup>
