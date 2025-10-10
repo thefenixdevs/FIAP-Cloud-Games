@@ -1,8 +1,6 @@
 using GameStore.API.Authorization;
 using GameStore.API.Middleware;
-using GameStore.Application;
 using GameStore.CrossCutting.DependencyInjection;
-using GameStore.Infrastructure;
 using GameStore.Infrastructure.Data.Initialization;
 using Microsoft.AspNetCore.Authorization;
 using Serilog;

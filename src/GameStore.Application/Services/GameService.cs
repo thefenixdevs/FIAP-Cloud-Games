@@ -44,6 +44,7 @@ public class GameService : IGameService
     {
       _logger.LogInformation("Creating new game: {Title}", request.Title);
 
+
       var game = new Game(
           request.Title,
           request.Description ?? string.Empty,

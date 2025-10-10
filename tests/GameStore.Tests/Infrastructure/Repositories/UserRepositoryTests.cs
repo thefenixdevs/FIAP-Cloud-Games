@@ -4,6 +4,7 @@ using GameStore.Infrastructure.Data;
 using GameStore.Infrastructure.Repositories.Abstractions;
 using GameStore.Infrastructure.Repositories.Games;
 using GameStore.Infrastructure.Repositories.Users;
+using GameStore.Tests.TestUtils;
 using Microsoft.EntityFrameworkCore;
 using Xunit;
 
@@ -36,7 +37,7 @@ public class UserRepositoryTests : IDisposable
   [Fact]
   public async Task GetByIdAsync_ShouldReturnUser_WhenUserExists()
   {
-    var user = new User("test@example.com", "testuser", "hashedpassword");
+    var user = CreateUser("test@example.com", "testuser");
     await _context.Users.AddAsync(user);
     await _context.SaveChangesAsync();
 
@@ -61,7 +62,7 @@ public class UserRepositoryTests : IDisposable
   [Fact]
   public async Task GetByEmailAsync_ShouldReturnUser_WhenUserExists()
   {
-    var user = new User("test@example.com", "testuser", "hashedpassword");
+    var user = CreateUser("test@example.com", "testuser");
     await _context.Users.AddAsync(user);
     await _context.SaveChangesAsync();
 
@@ -83,7 +84,7 @@ public class UserRepositoryTests : IDisposable
   [Fact]
   public async Task GetByEmailAsync_ShouldBeCaseInsensitive()
   {
-    var user = new User("Test@Example.com", "testuser", "hashedpassword");
+    var user = CreateUser("Test@Example.com", "testuser");
     await _context.Users.AddAsync(user);
     await _context.SaveChangesAsync();
 
@@ -96,7 +97,7 @@ public class UserRepositoryTests : IDisposable
   [Fact]
   public async Task GetByUsernameAsync_ShouldReturnUser_WhenUserExists()
   {
-    var user = new User("test@example.com", "testuser", "hashedpassword");
+    var user = CreateUser("test@example.com", "testuser");
     await _context.Users.AddAsync(user);
     await _context.SaveChangesAsync();
 
@@ -118,7 +119,7 @@ public class UserRepositoryTests : IDisposable
   [Fact]
   public async Task ExistsByEmailAsync_ShouldReturnTrue_WhenUserExists()
   {
-    var user = new User("test@example.com", "testuser", "hashedpassword");
+    var user = CreateUser("test@example.com", "testuser");
     await _context.Users.AddAsync(user);
     await _context.SaveChangesAsync();
 
@@ -138,7 +139,7 @@ public class UserRepositoryTests : IDisposable
   [Fact]
   public async Task ExistsByUsernameAsync_ShouldReturnTrue_WhenUserExists()
   {
-    var user = new User("test@example.com", "testuser", "hashedpassword");
+    var user = CreateUser("test@example.com", "testuser");
     await _context.Users.AddAsync(user);
     await _context.SaveChangesAsync();
 
@@ -158,7 +159,7 @@ public class UserRepositoryTests : IDisposable
   [Fact]
   public async Task AddAsync_ShouldAddUser_WhenUserIsValid()
   {
-    var user = new User("newuser@example.com", "newuser", "hashedpassword");
+    var user = CreateUser("newuser@example.com", "newuser");
 
     await _repository.AddAsync(user);
     await _unitOfWork.CommitAsync();
@@ -172,7 +173,7 @@ public class UserRepositoryTests : IDisposable
   [Fact]
   public async Task CommitAsync_ShouldPersistChanges_WhenCalled()
   {
-    var user = new User("test@example.com", "testuser", "hashedpassword");
+    var user = CreateUser("test@example.com", "testuser");
     await _repository.AddAsync(user);
 
     var countBeforeSave = await _context.Users.CountAsync();
@@ -187,9 +188,9 @@ public class UserRepositoryTests : IDisposable
   [Fact]
   public async Task AddAsync_ShouldHandleMultipleUsers_WhenAddedSequentially()
   {
-    var user1 = new User("user1@example.com", "user1", "hashedpassword1");
-    var user2 = new User("user2@example.com", "user2", "hashedpassword2");
-    var user3 = new User("user3@example.com", "user3", "hashedpassword3");
+    var user1 = CreateUser("user1@example.com", "user1");
+    var user2 = CreateUser("user2@example.com", "user2");
+    var user3 = CreateUser("user3@example.com", "user3");
 
     await _repository.AddAsync(user1);
     await _repository.AddAsync(user2);
@@ -203,9 +204,9 @@ public class UserRepositoryTests : IDisposable
   [Fact]
   public async Task GetByEmailAsync_ShouldReturnCorrectUser_WhenMultipleUsersExist()
   {
-    var user1 = new User("user1@example.com", "user1", "hashedpassword1");
-    var user2 = new User("user2@example.com", "user2", "hashedpassword2");
-    var user3 = new User("user3@example.com", "user3", "hashedpassword3");
+    var user1 = CreateUser("user1@example.com", "user1");
+    var user2 = CreateUser("user2@example.com", "user2");
+    var user3 = CreateUser("user3@example.com", "user3");
     await _context.Users.AddRangeAsync(user1, user2, user3);
     await _context.SaveChangesAsync();
 
@@ -213,15 +214,15 @@ public class UserRepositoryTests : IDisposable
 
     Assert.NotNull(result);
     Assert.Equal(user2.Id, result.Id);
-    Assert.Equal("user2@example.com", result.Email);
+    Assert.Equal("user2@example.com", result.Email.Value);
   }
 
   [Fact]
   public async Task GetByUsernameAsync_ShouldReturnCorrectUser_WhenMultipleUsersExist()
   {
-    var user1 = new User("user1@example.com", "user1", "hashedpassword1");
-    var user2 = new User("user2@example.com", "user2", "hashedpassword2");
-    var user3 = new User("user3@example.com", "user3", "hashedpassword3");
+    var user1 = CreateUser("user1@example.com", "user1");
+    var user2 = CreateUser("user2@example.com", "user2");
+    var user3 = CreateUser("user3@example.com", "user3");
     await _context.Users.AddRangeAsync(user1, user2, user3);
     await _context.SaveChangesAsync();
 
@@ -229,13 +230,13 @@ public class UserRepositoryTests : IDisposable
 
     Assert.NotNull(result);
     Assert.Equal(user2.Id, result.Id);
-    Assert.Equal("user2", result.Username);
+    Assert.Equal("user2", result.Username.Value);
   }
 
   [Fact]
   public async Task AddAsync_ShouldPreserveUserProperties_WhenSaved()
   {
-    var user = new User("test@example.com", "testuser", "hashedpassword", ProfileType.Admin);
+    var user = CreateUser("test@example.com", "testuser", profileType: ProfileType.Admin);
     user.ConfirmAccount();
 
     await _repository.AddAsync(user);
@@ -244,13 +245,13 @@ public class UserRepositoryTests : IDisposable
     var result = await _context.Users.FindAsync(user.Id);
     Assert.NotNull(result);
     Assert.Equal(ProfileType.Admin, result.ProfileType);
-    Assert.Equal(AccountStatus.Confirmed, result.AccountStatus);
+    Assert.Equal(AccountStatus.Active, result.AccountStatus);
   }
 
   [Fact]
   public async Task ExistsByEmailAsync_ShouldNotReturnFalsePositives_WithSimilarEmails()
   {
-    var user = new User("test@example.com", "testuser", "hashedpassword");
+    var user = CreateUser("test@example.com", "testuser");
     await _context.Users.AddAsync(user);
     await _context.SaveChangesAsync();
 
@@ -262,12 +263,18 @@ public class UserRepositoryTests : IDisposable
   [Fact]
   public async Task ExistsByUsernameAsync_ShouldNotReturnFalsePositives_WithSimilarUsernames()
   {
-    var user = new User("test@example.com", "testuser", "hashedpassword");
+    var user = CreateUser("test@example.com", "testuser");
     await _context.Users.AddAsync(user);
     await _context.SaveChangesAsync();
 
     var result = await _repository.ExistsByUsernameAsync("testuser2");
 
     Assert.False(result);
+  }
+
+  private static User CreateUser(string email, string username, string password = "Password123!", ProfileType profileType = ProfileType.CommonUser, string? name = null)
+  {
+    var hasher = new TestPasswordHasher();
+    return User.Register(name ?? "Test User", email, username, password, hasher, profileType);
   }
 }
