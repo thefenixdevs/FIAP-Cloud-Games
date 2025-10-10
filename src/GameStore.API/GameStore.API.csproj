@@ -27,8 +27,4 @@
     <ProjectReference Include="..\GameStore.Infrastructure\GameStore.Infrastructure.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Database\" />
-  </ItemGroup>
-
 </Project>

@@ -230,7 +230,7 @@ public class UserRepositoryTests : IDisposable
 
     Assert.NotNull(result);
     Assert.Equal(user2.Id, result.Id);
-    Assert.Equal("user2", result.Username.Value);
+    Assert.Equal("user2", result.Username);
   }
 
   [Fact]

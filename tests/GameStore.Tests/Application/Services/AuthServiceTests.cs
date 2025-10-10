@@ -97,7 +97,7 @@ public class AuthServiceTests
     await _authService.RegisterAsync(request);
 
     Assert.NotNull(capturedUser);
-    Assert.Equal("HASH::Password123!", capturedUser!.PasswordHash);
+    Assert.Equal("HASH::Password123!", capturedUser!.Password.Hash);
     _passwordHasherMock.Verify(x => x.Hash(request.Password), Times.Once);
   }
 
@@ -138,7 +138,7 @@ public class AuthServiceTests
     var expectedToken = "jwt-token";
 
     _userRepositoryMock.Setup(x => x.GetByEmailAsync(email)).ReturnsAsync(user);
-    _passwordHasherMock.Setup(x => x.Verify(user.PasswordHash, request.Password)).Returns(true);
+    _passwordHasherMock.Setup(x => x.Verify(user.Password.Hash, request.Password)).Returns(true);
     _jwtServiceMock.Setup(x => x.GenerateToken(user)).Returns(expectedToken);
 
     var result = await _authService.LoginAsync(request);
@@ -147,7 +147,7 @@ public class AuthServiceTests
     Assert.Equal("Login successful", result.Message);
     Assert.NotNull(result.Response);
     Assert.Equal(user.Id, result.Response.UserId);
-    Assert.Equal(user.Username.Value, result.Response.Username);
+    Assert.Equal(user.Username, result.Response.Username);
     Assert.Equal(user.Email.Value, result.Response.Email);
     Assert.Equal(expectedToken, result.Response.Token);
     Assert.Equal(user.ProfileType, result.Response.ProfileType);
@@ -163,7 +163,7 @@ public class AuthServiceTests
     var expectedToken = "jwt-token";
 
     _userRepositoryMock.Setup(x => x.GetByUsernameAsync(username)).ReturnsAsync(user);
-    _passwordHasherMock.Setup(x => x.Verify(user.PasswordHash, request.Password)).Returns(true);
+    _passwordHasherMock.Setup(x => x.Verify(user.Password.Hash, request.Password)).Returns(true);
     _jwtServiceMock.Setup(x => x.GenerateToken(user)).Returns(expectedToken);
 
     var result = await _authService.LoginAsync(request);
@@ -172,7 +172,7 @@ public class AuthServiceTests
     Assert.Equal("Login successful", result.Message);
     Assert.NotNull(result.Response);
     Assert.Equal(user.Id, result.Response.UserId);
-    Assert.Equal(user.Username.Value, result.Response.Username);
+    Assert.Equal(user.Username, result.Response.Username);
     Assert.Equal(user.Email.Value, result.Response.Email);
     Assert.Equal(expectedToken, result.Response.Token);
     Assert.Equal(user.ProfileType, result.Response.ProfileType);
@@ -202,7 +202,7 @@ public class AuthServiceTests
     var user = CreateActiveUser(email, "testuser", "CorrectPassword1!");
 
     _userRepositoryMock.Setup(x => x.GetByEmailAsync(email)).ReturnsAsync(user);
-    _passwordHasherMock.Setup(x => x.Verify(user.PasswordHash, request.Password)).Returns(false);
+    _passwordHasherMock.Setup(x => x.Verify(user.Password.Hash, request.Password)).Returns(false);
 
     var result = await _authService.LoginAsync(request);
 
@@ -220,7 +220,7 @@ public class AuthServiceTests
     user.BanAccount();
 
     _userRepositoryMock.Setup(x => x.GetByEmailAsync(email)).ReturnsAsync(user);
-    _passwordHasherMock.Setup(x => x.Verify(user.PasswordHash, request.Password)).Returns(true);
+    _passwordHasherMock.Setup(x => x.Verify(user.Password.Hash, request.Password)).Returns(true);
 
     var result = await _authService.LoginAsync(request);
 
@@ -237,7 +237,7 @@ public class AuthServiceTests
     var user = CreateUser(email, "testuser", request.Password);
 
     _userRepositoryMock.Setup(x => x.GetByEmailAsync(email)).ReturnsAsync(user);
-    _passwordHasherMock.Setup(x => x.Verify(user.PasswordHash, request.Password)).Returns(true);
+    _passwordHasherMock.Setup(x => x.Verify(user.Password.Hash, request.Password)).Returns(true);
 
     var result = await _authService.LoginAsync(request);
 
@@ -268,7 +268,7 @@ public class AuthServiceTests
     var user = CreateActiveUser(email, "testuser", request.Password);
 
     _userRepositoryMock.Setup(x => x.GetByEmailAsync(email)).ReturnsAsync(user);
-    _passwordHasherMock.Setup(x => x.Verify(user.PasswordHash, request.Password)).Returns(true);
+    _passwordHasherMock.Setup(x => x.Verify(user.Password.Hash, request.Password)).Returns(true);
     _jwtServiceMock.Setup(x => x.GenerateToken(user)).Returns("jwt-token");
 
     await _authService.LoginAsync(request);
@@ -285,7 +285,7 @@ public class AuthServiceTests
     user.BlockAccount();
 
     _userRepositoryMock.Setup(x => x.GetByEmailAsync(email)).ReturnsAsync(user);
-    _passwordHasherMock.Setup(x => x.Verify(user.PasswordHash, request.Password)).Returns(true);
+    _passwordHasherMock.Setup(x => x.Verify(user.Password.Hash, request.Password)).Returns(true);
 
     var result = await _authService.LoginAsync(request);
 

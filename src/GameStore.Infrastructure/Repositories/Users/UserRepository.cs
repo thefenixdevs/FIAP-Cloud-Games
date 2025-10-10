@@ -1,6 +1,6 @@
 using GameStore.Domain.Entities;
-using GameStore.Domain.ValueObjects;
 using GameStore.Domain.Repositories;
+using GameStore.Domain.ValueObjects;
 using GameStore.Infrastructure.Data;
 using GameStore.Infrastructure.Repositories.Abstractions;
 using Microsoft.EntityFrameworkCore;
@@ -25,8 +25,9 @@ public class UserRepository : EFRepository<User>, IUserRepository
 
   public async Task<User?> GetByUsernameAsync(string username)
   {
-    var normalizedUsername = Username.Create(username);
-    return await _context.Users.FirstOrDefaultAsync(u => u.Username == normalizedUsername);
+    var normalizedUsername = UsernameNormalizer.NormalizeForComparison(username);
+    return await _context.Users.FirstOrDefaultAsync(
+      u => u.Username.ToLower() == normalizedUsername);
   }
 
   public async Task<bool> ExistsByEmailAsync(string email)
@@ -37,7 +38,8 @@ public class UserRepository : EFRepository<User>, IUserRepository
 
   public async Task<bool> ExistsByUsernameAsync(string username)
   {
-    var normalizedUsername = Username.Create(username);
-    return await _context.Users.AnyAsync(u => u.Username == normalizedUsername);
+    var normalizedUsername = UsernameNormalizer.NormalizeForComparison(username);
+    return await _context.Users.AnyAsync(
+      u => u.Username.ToLower() == normalizedUsername);
   }
 }

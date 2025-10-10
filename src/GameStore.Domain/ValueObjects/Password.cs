@@ -4,18 +4,13 @@ using GameStore.Domain.Security;
 
 namespace GameStore.Domain.ValueObjects;
 
-public sealed class Password : IEquatable<Password>
+public readonly record struct Password
 {
   private const int MinimumPasswordLength = 8;
   private const string PasswordPattern = @"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^\da-zA-Z]).+$";
   private static readonly Regex StrongPasswordRegex = new(PasswordPattern, RegexOptions.Compiled);
 
-  public string Hash { get; private set; }
-
-  private Password()
-  {
-    Hash = string.Empty;
-  }
+  public string Hash { get; }
 
   private Password(string hash)
   {
@@ -48,29 +43,6 @@ public sealed class Password : IEquatable<Password>
   }
 
   public override string ToString() => Hash;
-
-  public bool Equals(Password? other)
-  {
-    if (ReferenceEquals(null, other))
-    {
-      return false;
-    }
-
-    if (ReferenceEquals(this, other))
-    {
-      return true;
-    }
-
-    return string.Equals(Hash, other.Hash, StringComparison.Ordinal);
-  }
-
-  public override bool Equals(object? obj) => obj is Password other && Equals(other);
-
-  public override int GetHashCode() => Hash.GetHashCode(StringComparison.Ordinal);
-
-  public static bool operator ==(Password? left, Password? right) => Equals(left, right);
-
-  public static bool operator !=(Password? left, Password? right) => !Equals(left, right);
 
   private static void EnsurePasswordStrength(string password)
   {

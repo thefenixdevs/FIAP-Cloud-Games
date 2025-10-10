@@ -44,7 +44,7 @@ public class AuthService : IAuthService
       await _unitOfWork.Users.AddAsync(user);
       await _unitOfWork.CommitAsync();
 
-      _logger.LogInformation("User {Username} registered successfully with ID {UserId}", user.Username.Value, user.Id);
+      _logger.LogInformation("User {Username} registered successfully with ID {UserId}", user.Username, user.Id);
       return (true, "User registered successfully", user.Id);
     }
     catch (ArgumentException ex) when (ex.ParamName == "password")
@@ -108,13 +108,13 @@ public class AuthService : IAuthService
 
       var response = new LoginResponse(
         user.Id,
-        user.Username.Value,
+        user.Username,
         user.Email.Value,
         token,
         user.ProfileType,
         user.AccountStatus);
 
-      _logger.LogInformation("User {Username} logged in successfully using {Lookup}", user.Username.Value, lookedUpBy);
+      _logger.LogInformation("User {Username} logged in successfully using {Lookup}", user.Username, lookedUpBy);
       return (true, "Login successful", response);
     }
     catch (Exception ex)

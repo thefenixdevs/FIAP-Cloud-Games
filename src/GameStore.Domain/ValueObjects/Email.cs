@@ -3,14 +3,9 @@ using System.Net.Mail;
 
 namespace GameStore.Domain.ValueObjects;
 
-public sealed class Email : IEquatable<Email>
+public readonly record struct Email
 {
-  public string Value { get; private set; }
-
-  private Email()
-  {
-    Value = string.Empty;
-  }
+  public string Value { get; }
 
   private Email(string value)
   {
@@ -37,28 +32,6 @@ public sealed class Email : IEquatable<Email>
 
   public override string ToString() => Value;
 
-  public bool Equals(Email? other)
-  {
-    if (ReferenceEquals(null, other))
-    {
-      return false;
-    }
-
-    if (ReferenceEquals(this, other))
-    {
-      return true;
-    }
-
-    return string.Equals(Value, other.Value, StringComparison.OrdinalIgnoreCase);
-  }
-
-  public override bool Equals(object? obj) => obj is Email other && Equals(other);
-
-  public override int GetHashCode() => Value.GetHashCode(StringComparison.OrdinalIgnoreCase);
-
-  public static bool operator ==(Email? left, Email? right) => Equals(left, right);
-
-  public static bool operator !=(Email? left, Email? right) => !Equals(left, right);
-
   public static implicit operator string(Email email) => email.Value;
+  public static explicit operator Email(string email) => Create(email);
 }

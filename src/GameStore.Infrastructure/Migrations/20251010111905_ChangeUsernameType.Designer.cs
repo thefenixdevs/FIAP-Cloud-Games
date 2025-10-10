@@ -3,6 +3,7 @@ using System;
 using GameStore.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -10,9 +11,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace GameStore.Infrastructure.Migrations
 {
     [DbContext(typeof(GameStoreContext))]
-    partial class GameStoreContextModelSnapshot : ModelSnapshot
+    [Migration("20251010111905_ChangeUsernameType")]
+    partial class ChangeUsernameType
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "9.0.9");

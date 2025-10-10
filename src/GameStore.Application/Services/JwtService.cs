@@ -35,7 +35,7 @@ public class JwtService : IJwtService
       {
                 new Claim(JwtRegisteredClaimNames.Sub, user.Id.ToString()),
                 new Claim(JwtRegisteredClaimNames.Email, user.Email.Value),
-                new Claim(JwtRegisteredClaimNames.UniqueName, user.Username.Value),
+                new Claim(JwtRegisteredClaimNames.UniqueName, user.Username),
                 new Claim("ProfileType", user.ProfileType.ToString()),
                 new Claim("AccountStatus", user.AccountStatus.ToString()),
                 new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())

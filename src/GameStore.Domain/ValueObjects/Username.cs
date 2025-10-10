@@ -2,54 +2,28 @@ using System;
 
 namespace GameStore.Domain.ValueObjects;
 
-public sealed class Username : IEquatable<Username>
+/// <summary>
+/// Helper utilities for user name normalization and comparison.
+/// </summary>
+public static class UsernameNormalizer
 {
-  public string Value { get; private set; }
-
-  private Username()
-  {
-    Value = string.Empty;
-  }
-
-  private Username(string value)
-  {
-    Value = value;
-  }
-
-  public static Username Create(string username)
+  public static string Normalize(string username)
   {
     if (string.IsNullOrWhiteSpace(username))
     {
       throw new ArgumentException("Username must be provided.", nameof(username));
     }
 
-    return new Username(username.Trim().ToLower());
+    return username.Trim();
   }
 
-  public override string ToString() => Value;
-
-  public bool Equals(Username? other)
+  public static string NormalizeForComparison(string username)
   {
-    if (ReferenceEquals(null, other))
-    {
-      return false;
-    }
-
-    if (ReferenceEquals(this, other))
-    {
-      return true;
-    }
-
-    return string.Equals(Value, other.Value, StringComparison.OrdinalIgnoreCase);
+    return Normalize(username).ToLowerInvariant();
   }
 
-  public override bool Equals(object? obj) => obj is Username other && Equals(other);
-
-  public override int GetHashCode() => Value.GetHashCode(StringComparison.OrdinalIgnoreCase);
-
-  public static bool operator ==(Username? left, Username? right) => Equals(left, right);
-
-  public static bool operator !=(Username? left, Username? right) => !Equals(left, right);
-
-  public static implicit operator string(Username username) => username.Value;
+  public static bool AreEqual(string left, string right)
+  {
+    return string.Equals(NormalizeForComparison(left), NormalizeForComparison(right), StringComparison.Ordinal);
+  }
 }

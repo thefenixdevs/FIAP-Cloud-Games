@@ -7,10 +7,9 @@ namespace GameStore.Domain.Entities;
 public class User : BaseEntity
 {
   public string Name { get; private set; } = string.Empty;
-  public Email Email { get; private set; } = default!;
-  public Password Password { get; private set; } = default!;
-  public Username Username { get; private set; } = default!;
-  public string PasswordHash => Password.Hash;
+  public Email Email { get; private set; } = default;
+  public Password Password { get; private set; } = default;
+  public string Username { get; private set; } = string.Empty;
   public ProfileType ProfileType { get; private set; }
   public AccountStatus AccountStatus { get; private set; }
 
@@ -19,11 +18,11 @@ public class User : BaseEntity
     AccountStatus = AccountStatus.Pending;
   }
 
-  private User(Email email, Username username, string name, ProfileType profileType) : this()
+  private User(Email email, string username, string name, ProfileType profileType) : this()
   {
     Id = Guid.NewGuid();
     Email = email;
-    Username = username;
+    SetUsername(username);
     SetName(name);
     ProfileType = profileType;
     CreatedAt = DateTime.UtcNow;
@@ -34,7 +33,7 @@ public class User : BaseEntity
   {
     ArgumentNullException.ThrowIfNull(passwordHasher);
 
-    var user = new User(Email.Create(email), Username.Create(username), name, profileType);
+    var user = new User(Email.Create(email), username, name, profileType);
     user.SetPassword(password, passwordHasher);
     return user;
   }
@@ -120,7 +119,7 @@ public class User : BaseEntity
 
   public void UpdateProfile(string username, string? name = null)
   {
-    Username = Username.Create(username);
+    SetUsername(username);
 
     if (!string.IsNullOrWhiteSpace(name))
     {
@@ -144,5 +143,10 @@ public class User : BaseEntity
     }
 
     Name = name.Trim();
+  }
+
+  private void SetUsername(string username)
+  {
+    Username = UsernameNormalizer.Normalize(username);
   }
 }
