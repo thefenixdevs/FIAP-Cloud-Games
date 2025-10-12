@@ -1,4 +1,3 @@
-using System.Threading;
 using GameStore.Application.DTOs;
 using GameStore.Application.Services;
 using GameStore.Domain.Entities;
@@ -9,7 +8,6 @@ using GameStore.Domain.Security;
 using GameStore.Tests.TestUtils;
 using Microsoft.Extensions.Logging;
 using Moq;
-using Xunit;
 
 namespace GameStore.Tests.Application.Services;
 

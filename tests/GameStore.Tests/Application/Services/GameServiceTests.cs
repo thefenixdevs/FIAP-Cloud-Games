@@ -8,14 +8,14 @@ using Moq;
 
 namespace GameStore.Tests.Application.Services;
 
-public class GameServiceTestsTest
+public class GameServiceTests
 {
   private readonly Mock<IGameRepository> _gameRepositoryMock;
   private readonly Mock<IUnitOfWork> _unitOfWorkMock;
   private readonly Mock<ILogger<GameService>> _loggerMock;
   private readonly GameService _gameService;
 
-  public GameServiceTestsTest()
+  public GameServiceTests()
   {
     _gameRepositoryMock = new Mock<IGameRepository>();
     _unitOfWorkMock = new Mock<IUnitOfWork>();
@@ -63,7 +63,7 @@ public class GameServiceTestsTest
     var game1 = new Game("Game 1", "Just a Game", 10m, "Action", null);
     game1.Id = Guid.NewGuid();
     var game2 = new Game("Game 2", "Another Game", 20m, "RPG", null);
-    game1.Id = Guid.NewGuid();
+    game2.Id = Guid.NewGuid();
     var games = new List<Game>
     {
         game1,
@@ -84,7 +84,7 @@ public class GameServiceTestsTest
   [Fact]
   public async Task CreateGameAsync_CreatesGameAndReturnsDto()
   {
-        // Arrange
+    // Arrange
     var createGameRequest = new CreateGameRequest("New Game", "Just a Game", 30m, "Strategy", null);
     var createdGame = new Game(createGameRequest.Title, createGameRequest.Description, createGameRequest.Price, createGameRequest.Genre, createGameRequest.ReleaseDate);
 
