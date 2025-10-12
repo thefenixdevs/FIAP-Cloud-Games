@@ -67,10 +67,10 @@ artifacts/
 ScaffoldingReadMe.txt
 
 # Application runtime data
-GameStore.API/Database/*
-!GameStore.API/Database/.gitkeep
-GameStore.API/logs/*
-!GameStore.API/logs/.gitkeep
+**/GameStore.API/Database/*
+!**/GameStore.API/Database/.gitkeep
+**/GameStore.API/logs/*
+!**/GameStore.API/logs/.gitkeep
 
 # StyleCop
 StyleCopReport.xml
@@ -367,3 +367,17 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
+
+# SQLite databases and related files
+*.db
+*.sqlite
+*.sqlite3
+*.db-journal
+*.sqlite-journal
+*.sqlite3-journal
+*.db-wal
+*.sqlite-wal
+*.sqlite3-wal
+*.db-shm
+*.sqlite-shm
+*.sqlite3-shm

@@ -29,14 +29,44 @@ public class User : BaseEntity
     UpdatedAt = CreatedAt;
   }
 
-  public static User Register(string name, string email, string username, string password, IPasswordHasher passwordHasher, ProfileType profileType = ProfileType.CommonUser)
-  {
-    ArgumentNullException.ThrowIfNull(passwordHasher);
+    private User(string name, Email email, string username, ProfileType profileType) : this()
+    {
+        SetName(name);
+        Email = email;
+        Username = username;
+        ProfileType = profileType;
+        UpdatedAt = DateTime.UtcNow;
+    }
+
+    public static User Register(string name, string email, string username, string password, IPasswordHasher passwordHasher, ProfileType profileType = ProfileType.CommonUser)
+    {
+        ArgumentNullException.ThrowIfNull(passwordHasher);
 
     var user = new User(Email.Create(email), username, name, profileType);
     user.SetPassword(password, passwordHasher);
-    return user;
-  }
+        return user;
+    }
+
+    public static User Update(User user, string name, string email, string username, AccountStatus AccountStatus, ProfileType profileType = ProfileType.CommonUser)
+    {
+        user.Name = name;
+        user.Email = Email.Create(email);
+        user.Username = username;
+        user.ProfileType = profileType;
+        switch (AccountStatus)
+        {
+            case AccountStatus.Active:
+                user.ConfirmAccount();
+                break;
+            case AccountStatus.Blocked: 
+                user.BlockAccount(); 
+                break;
+            case AccountStatus.Banned:
+                user.BanAccount();
+                break;
+        }
+        return user;
+    }
 
   public void SetPassword(string password, IPasswordHasher passwordHasher)
   {
