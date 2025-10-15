@@ -48,6 +48,18 @@ public class UserService : IUserService
     {
       _logger.LogInformation("Creating new user: {Username}", request.Username);
 
+      if (await _unitOfWork.Users.ExistsByEmailAsync(request.Email))
+      {
+        _logger.LogWarning("Create User failed: Email {Email} already exists", request.Email);
+        return (false, "Email already exists", null);
+      }
+
+      if (await _unitOfWork.Users.ExistsByUsernameAsync(request.Username))
+      {
+        _logger.LogWarning("Create User failed: Username {Username} already exists", request.Username);
+        return (false, "Username already exists", null);
+      }
+
       var user = User.Register(request.Name, request.Email, request.Username, request.Password, _passwordHasher, request.ProfileType);
 
       await _unitOfWork.Users.AddAsync(user);
@@ -74,6 +86,18 @@ public class UserService : IUserService
       {
         _logger.LogWarning("User with ID {UserId} not found", id);
         return (false, "User not found");
+      }
+
+      if (await _unitOfWork.Users.ExistsByEmailAsync(request.Email))
+      {
+        _logger.LogWarning("Create User failed: Email {Email} already exists", request.Email);
+        return (false, "Email already exists");
+      }
+
+      if (await _unitOfWork.Users.ExistsByUsernameAsync(request.Username))
+      {
+        _logger.LogWarning("Create User failed: Username {Username} already exists", request.Username);
+        return (false, "Username already exists");
       }
 
       user = User.Update(user, request.Name, request.Email, request.Username, request.AccountStatus, request.ProfileType);
