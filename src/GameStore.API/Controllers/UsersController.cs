@@ -70,7 +70,7 @@ public class UsersController : ControllerBase
     }
 
     [HttpPut("{id}")]
-    [Authorize(Policy = "ConfirmedAdmin")]
+    [Authorize]
     public async Task<IActionResult> UpdateUser(Guid id, [FromBody] UpdateUserRequest request)
     {
         if (string.IsNullOrWhiteSpace(request.Name))
@@ -92,14 +92,14 @@ public class UsersController : ControllerBase
 
         if (!success)
         {
-            return BadRequest(new { message });
+            return NotFound(new { message });
         }
 
         return NoContent();
     }
 
     [HttpDelete("{id}")]
-    [Authorize(Policy = "ConfirmedAdmin")]
+    [Authorize]
     public async Task<IActionResult> DeleteUser(Guid id)
     {
         var (success, message) = await _userService.DeleteUserAsync(id);
