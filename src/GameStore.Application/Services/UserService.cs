@@ -88,13 +88,13 @@ public class UserService : IUserService
         return (false, "User not found");
       }
 
-      if (await _unitOfWork.Users.ExistsByEmailAsync(request.Email))
+      if(user.Email.Value != request.Email && await _unitOfWork.Users.ExistsByEmailAsync(request.Email))
       {
         _logger.LogWarning("Create User failed: Email {Email} already exists", request.Email);
         return (false, "Email already exists");
       }
 
-      if (await _unitOfWork.Users.ExistsByUsernameAsync(request.Username))
+      if (user.Username != request.Username && await _unitOfWork.Users.ExistsByUsernameAsync(request.Username))
       {
         _logger.LogWarning("Create User failed: Username {Username} already exists", request.Username);
         return (false, "Username already exists");
