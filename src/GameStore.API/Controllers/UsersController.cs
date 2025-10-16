@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using GameStore.Application.DTOs;
 using GameStore.Application.Services;
+using Microsoft.AspNetCore.Http.HttpResults;
 
 namespace GameStore.API.Controllers;
 
@@ -66,7 +67,7 @@ public class UsersController : ControllerBase
             return BadRequest(new { message });
         }
 
-        return CreatedAtAction(nameof(GetUser), new { id = user.Id }, user);
+        return Ok(new { message, user.Id });
     }
 
     [HttpPut("{id}")]
@@ -95,7 +96,7 @@ public class UsersController : ControllerBase
             return NotFound(new { message });
         }
 
-        return NoContent();
+        return Ok(message);
     }
 
     [HttpDelete("{id}")]
@@ -109,6 +110,6 @@ public class UsersController : ControllerBase
             return NotFound(new { message });
         }
 
-        return NoContent();
+        return Ok(message);
     }
 }
