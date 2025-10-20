@@ -1,5 +1,5 @@
-﻿using GameStore.Domain.Entities;
-using GameStore.Domain.ValueObjects;
+﻿using GameStore.Domain.Aggregates.UserAggregate;
+using GameStore.Domain.Aggregates.UserAggregate.ValueObjects;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -33,6 +33,12 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
     builder.Property(e => e.Name).IsRequired();
     builder.Property(e => e.AccountStatus).HasConversion<string>().IsRequired();
     builder.Property(e => e.ProfileType).HasConversion<string>().IsRequired();
+    builder.Property(e => e.EmailConfirmationTokenExpiresAt);
+    builder.Property(e => e.PasswordResetToken);
+    builder.Property(e => e.PasswordResetTokenExpiresAt);
+    builder.Property(e => e.IsTemporaryPassword).HasDefaultValue(false);
+    builder.Property(e => e.PendingEmail);
+    builder.Property(e => e.PendingEmailToken);
     builder.HasIndex(e => e.Email).IsUnique();
     builder.HasIndex(e => e.Username).IsUnique();
   }

@@ -1,0 +1,33 @@
+<mjml>
+  <mj-head>
+    <mj-title>Notificação - Game Store</mj-title>
+    <mj-attributes>
+      <mj-all font-family="Arial, sans-serif" />
+      <mj-text color="#333333" font-size="14px" line-height="20px" />
+    </mj-attributes>
+  </mj-head>
+  <mj-body background-color="#f4f4f4">
+    <mj-section background-color="#ffffff" padding="20px">
+      <mj-column>
+        <mj-text font-size="24px" font-weight="bold" color="#2196F3" align="center" padding-bottom="20px">
+          Game Store
+        </mj-text>
+        <mj-divider border-color="#2196F3" border-width="2px" />
+        <mj-text font-size="20px" font-weight="bold" padding-top="20px">
+          Olá, {{UserName}}!
+        </mj-text>
+        <mj-text padding-top="10px">
+          {{Message}}
+        </mj-text>
+        <mj-divider border-color="#e0e0e0" border-width="1px" padding-top="30px" />
+        <mj-text font-size="12px" color="#999999" align="center" padding-top="10px">
+          Esta é uma mensagem automática. Por favor, não responda este email.
+        </mj-text>
+        <mj-text font-size="12px" color="#999999" align="center">
+          © 2025 Game Store. Todos os direitos reservados.
+        </mj-text>
+      </mj-column>
+    </mj-section>
+  </mj-body>
+</mjml>
+

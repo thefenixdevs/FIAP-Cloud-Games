@@ -1,8 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using GameStore.Domain.Entities;
-using GameStore.Domain.Repositories.Abstractions;
+using GameStore.Domain.SeedWork.Entities;
+using GameStore.Domain.SeedWork.Repositories;
 using GameStore.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 

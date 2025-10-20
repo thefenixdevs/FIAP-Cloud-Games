@@ -2,17 +2,11 @@ using System.Diagnostics;
 
 namespace GameStore.API.Middleware;
 
-public class CorrelationIdMiddleware
+public class CorrelationIdMiddleware(RequestDelegate next, ILogger<CorrelationIdMiddleware> logger)
 {
-    private readonly RequestDelegate _next;
-    private readonly ILogger<CorrelationIdMiddleware> _logger;
+    private readonly RequestDelegate _next = next;
+    private readonly ILogger<CorrelationIdMiddleware> _logger = logger;
     private const string CorrelationIdHeaderName = "X-Correlation-Id";
-
-    public CorrelationIdMiddleware(RequestDelegate next, ILogger<CorrelationIdMiddleware> logger)
-    {
-        _next = next;
-        _logger = logger;
-    }
 
     public async Task InvokeAsync(HttpContext context)
     {

@@ -1,8 +1,9 @@
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
-using GameStore.Application.Services;
-using GameStore.Domain.Entities;
-using GameStore.Domain.Enums;
+using GameStore.Application.Features.Auth;
+using GameStore.Domain.Aggregates.UserAggregate;
+using GameStore.Domain.Aggregates.UserAggregate.Enums;
+using GameStore.Domain.Aggregates.UserAggregate.ValueObjects;
 using GameStore.Tests.TestUtils;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
@@ -20,6 +21,9 @@ public class JwtServiceTests
   private User _adminUserActive;
   public JwtServiceTests()
   {
+    // Configurar o PasswordService para os testes
+    Password.ConfigureService(new TestPasswordService());
+    
     _loggerMock = new Mock<ILogger<JwtService>>();
 
     var inMemorySettings = new Dictionary<string, string>
@@ -35,13 +39,12 @@ public class JwtServiceTests
         .Build();
 
     var password = "Teste123!";
-    var testHasher = new TestPasswordHasher();
 
-    var commonUser = User.Register("Test User", "test@example.com", "testuser", password, testHasher);
+    var commonUser = User.Register("Test User", "test@example.com", "testuser", password);
     commonUser.ConfirmAccount();
     _commonUserActive = commonUser;
 
-    var adminUser = User.Register("Admin User", "admin@example.com", "adminuser", password, testHasher, ProfileType.Admin);
+    var adminUser = User.Register("Admin User", "admin@example.com", "adminuser", password, ProfileType.Admin);
     adminUser.ConfirmAccount();
     _adminUserActive = adminUser;
   }

@@ -1,12 +1,17 @@
-using GameStore.Application.DTOs;
-using GameStore.Application.Services;
-using GameStore.Domain.Entities;
-using GameStore.Domain.Enums;
-using GameStore.Domain.Repositories;
-using GameStore.Domain.Repositories.Abstractions;
-using GameStore.Domain.Security;
+using FluentValidation;
+using GameStore.Application.Features.Users.DTOs;
+using GameStore.Application.Features.Users;
+using GameStore.Tests.TestUtils;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Moq;
+using Mapster;
+using GameStore.Domain.Aggregates.UserAggregate;
+using GameStore.Domain.Aggregates.UserAggregate.Enums;
+using GameStore.Domain.Aggregates.UserAggregate.Repositories;
+using GameStore.Domain.Aggregates.UserAggregate.ValueObjects;
+using GameStore.Domain.SeedWork.Behavior;
+using GameStore.Domain.Services.EmailService;
 
 namespace GameStore.Tests.Application.Services;
 
@@ -14,20 +19,45 @@ public class UserServiceTests
 {
   private readonly Mock<IUserRepository> _userRepositoryMock;
   private readonly Mock<IUnitOfWork> _unitOfWorkMock;
+  private readonly Mock<IEmailService> _emailServiceMock;
+  private readonly Mock<IConfiguration> _configurationMock;
   private readonly Mock<ILogger<UserService>> _loggerMock;
-  private readonly Mock<IPasswordHasher> _passwordHasherMock;
+  private readonly Mock<IValidator<CreateUserRequest>> _createUserValidatorMock;
+  private readonly Mock<IValidator<UpdateUserRequest>> _updateUserValidatorMock;
+  private readonly TypeAdapterConfig _mapperConfig;
   private readonly UserService _userService;
 
   public UserServiceTests()
   {
+    // Configurar o PasswordService para os testes
+    Password.ConfigureService(new TestPasswordService());
+    
     _userRepositoryMock = new Mock<IUserRepository>();
     _unitOfWorkMock = new Mock<IUnitOfWork>();
+    _emailServiceMock = new Mock<IEmailService>();
+    _configurationMock = new Mock<IConfiguration>();
     _loggerMock = new Mock<ILogger<UserService>>();
-    _passwordHasherMock = new Mock<IPasswordHasher>();
-    _passwordHasherMock.Setup(x => x.Hash(It.IsAny<string>())).Returns<string>(password => $"HASH::{password}");
-    _passwordHasherMock.Setup(x => x.Verify(It.IsAny<string>(), It.IsAny<string>())).Returns<string, string>((hash, password) => hash == $"HASH::{password}");
+    _createUserValidatorMock = new Mock<IValidator<CreateUserRequest>>();
+    _updateUserValidatorMock = new Mock<IValidator<UpdateUserRequest>>();
+    _mapperConfig = new TypeAdapterConfig();
+    
     _unitOfWorkMock.SetupGet(x => x.Users).Returns(_userRepositoryMock.Object);
-    _userService = new UserService(_unitOfWorkMock.Object, _loggerMock.Object, _passwordHasherMock.Object);
+    _configurationMock.Setup(x => x["BaseUrl"]).Returns("http://localhost:5000");
+    
+    // Configurar validators para sempre retornar sucesso
+    _createUserValidatorMock.Setup(x => x.ValidateAsync(It.IsAny<CreateUserRequest>(), It.IsAny<CancellationToken>()))
+      .ReturnsAsync(new FluentValidation.Results.ValidationResult());
+    _updateUserValidatorMock.Setup(x => x.ValidateAsync(It.IsAny<UpdateUserRequest>(), It.IsAny<CancellationToken>()))
+      .ReturnsAsync(new FluentValidation.Results.ValidationResult());
+    
+    _userService = new UserService(
+      _unitOfWorkMock.Object,
+      _emailServiceMock.Object,
+      _loggerMock.Object,
+      _configurationMock.Object,
+      _mapperConfig,
+      _createUserValidatorMock.Object,
+      _updateUserValidatorMock.Object);
   }
 
   [Fact]
@@ -35,7 +65,7 @@ public class UserServiceTests
   {
     // Arrange
     var userId = Guid.NewGuid();
-    var user = User.Register("Test User", "TestUser@Email.com", "TestUsername", "Password@123", _passwordHasherMock.Object, ProfileType.CommonUser);
+    var user = User.Register("Test User", "TestUser@Email.com", "TestUsername", "Password@123", ProfileType.CommonUser);
     user.Id = userId;
     _userRepositoryMock.Setup(r => r.GetByIdAsync(userId)).ReturnsAsync(user);
 
@@ -66,9 +96,9 @@ public class UserServiceTests
   public async Task GetAllUsersAsync_ReturnsListOfUserDtos()
   {
     // Arrange
-    var user1 = User.Register("User 1", "TestUser1@email.com", "TestUsername1", "Password@123", _passwordHasherMock.Object, ProfileType.CommonUser);
+    var user1 = User.Register("User 1", "TestUser1@email.com", "TestUsername1", "Password@123", ProfileType.CommonUser);
     user1.Id = Guid.NewGuid();
-    var user2 = User.Register("User 2", "TestUser2@email.com", "TestUsername2", "Password@456", _passwordHasherMock.Object, ProfileType.Admin);
+    var user2 = User.Register("User 2", "TestUser2@email.com", "TestUsername2", "Password@456", ProfileType.Admin);
     user2.Id = Guid.NewGuid();
     var users = new List<User>
     {
@@ -92,7 +122,7 @@ public class UserServiceTests
   {
     // Arrange
     var createUserRequest = new CreateUserRequest("New User", "NewUser@email.com".ToLower(), "NewUsername", "Password@123", ProfileType.CommonUser);
-    var createdUser = User.Register(createUserRequest.Name, createUserRequest.Email, createUserRequest.Username, createUserRequest.Password, _passwordHasherMock.Object, createUserRequest.ProfileType);
+    var createdUser = User.Register(createUserRequest.Name, createUserRequest.Email, createUserRequest.Username, createUserRequest.Password, createUserRequest.ProfileType);
 
     _userRepositoryMock.Setup(r => r.AddAsync(It.IsAny<User>()));
 
@@ -114,7 +144,7 @@ public class UserServiceTests
     var userId = Guid.NewGuid();
     var updateUserRequest = new UpdateUserRequest("Updated User", "UpdatedUser@email.com".ToLower(), "UpdatedUsername", ProfileType.Admin, AccountStatus.Active);
 
-    var existingUser = User.Register("Old User", "OldUser@email.com", "OldUsername", "Password@123", _passwordHasherMock.Object, ProfileType.CommonUser);
+    var existingUser = User.Register("Old User", "OldUser@email.com", "OldUsername", "Password@123", ProfileType.CommonUser);
     existingUser.Id = userId;
     _userRepositoryMock.Setup(r => r.GetByIdAsync(userId)).ReturnsAsync(existingUser);
 
@@ -152,7 +182,7 @@ public class UserServiceTests
   {
     // Arrange
     var userId = Guid.NewGuid();
-    var existingUser = User.Register("Old User", "OldUser@email.com", "OldUsername", "Password@123", _passwordHasherMock.Object, ProfileType.CommonUser);
+    var existingUser = User.Register("Old User", "OldUser@email.com", "OldUsername", "Password@123", ProfileType.CommonUser);
     existingUser.Id = userId;
     _userRepositoryMock.Setup(r => r.GetByIdAsync(userId)).ReturnsAsync(existingUser);
 

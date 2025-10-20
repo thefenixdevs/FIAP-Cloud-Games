@@ -1,4 +1,4 @@
-using GameStore.Domain.Entities;
+using GameStore.Domain.Aggregates.GameAggregate;
 using GameStore.Infrastructure.Data;
 using GameStore.Infrastructure.Repositories.Abstractions;
 using GameStore.Infrastructure.Repositories.Games;

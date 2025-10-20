@@ -1,5 +1,6 @@
-using GameStore.Domain.Entities;
-using GameStore.Domain.Enums;
+using GameStore.Domain.Aggregates.UserAggregate;
+using GameStore.Domain.Aggregates.UserAggregate.Enums;
+using GameStore.Domain.Aggregates.UserAggregate.ValueObjects;
 using GameStore.Infrastructure.Data;
 using GameStore.Infrastructure.Repositories.Abstractions;
 using GameStore.Infrastructure.Repositories.Games;
@@ -18,6 +19,9 @@ public class UserRepositoryTests : IDisposable
 
   public UserRepositoryTests()
   {
+    // Configurar o PasswordService para os testes
+    Password.ConfigureService(new TestPasswordService());
+    
     var options = new DbContextOptionsBuilder<GameStoreContext>()
         .UseInMemoryDatabase(databaseName: Guid.NewGuid().ToString())
         .Options;
@@ -274,7 +278,6 @@ public class UserRepositoryTests : IDisposable
 
   private static User CreateUser(string email, string username, string password = "Password123!", ProfileType profileType = ProfileType.CommonUser, string? name = null)
   {
-    var hasher = new TestPasswordHasher();
-    return User.Register(name ?? "Test User", email, username, password, hasher, profileType);
+    return User.Register(name ?? "Test User", email, username, password, profileType);
   }
 }

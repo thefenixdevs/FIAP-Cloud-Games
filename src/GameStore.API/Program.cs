@@ -1,6 +1,10 @@
 using GameStore.API.Authorization;
+using GameStore.API.Extensions;
 using GameStore.API.Middleware;
-using GameStore.CrossCutting.DependencyInjection;
+using GameStore.CrossCutting.Installers.Libraries;
+using GameStore.CrossCutting.Installers.Services;
+using GameStore.Domain.Aggregates.UserAggregate.ValueObjects;
+using GameStore.Domain.Services.PasswordService;
 using GameStore.Infrastructure.Data.Initialization;
 using Microsoft.AspNetCore.Authorization;
 using Serilog;
@@ -32,9 +36,22 @@ builder.Services.AddSingleton<IAuthorizationHandler, ConfirmedAdminHandler>();
 // DI da camada Infrastructure (data, repositories, seeders)
 builder.Services.AddInfrastructure(builder.Configuration);
 // DI da camada Application (serviços, casos de uso, etc)
-builder.Services.AddApplication();
+builder.Services.AddApplication(builder.Configuration);
+// DI de serviços de email
+builder.Services.AddEmailServices(builder.Configuration);
+// DI de validação FluentValidation
+builder.Services.AddValidation();
+// DI do Mapster para mapeamentos
+builder.Services.AddMapster();
 
 var app = builder.Build();
+
+// Configurar o PasswordService no Password value object
+using (var scope = app.Services.CreateScope())
+{
+    var passwordService = scope.ServiceProvider.GetRequiredService<IPasswordService>();
+    Password.ConfigureService(passwordService);
+}
 
 // Inicialização do banco de dados: aplica migrations e executa seeders
 await app.Services.InitializeDatabaseAsync();
@@ -49,8 +66,8 @@ if (app.Environment.IsDevelopment())
   });
 }
 
-app.UseMiddleware<CorrelationIdMiddleware>();
 app.UseMiddleware<ExceptionHandlingMiddleware>();
+app.UseMiddleware<CorrelationIdMiddleware>();
 app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();
@@ -58,15 +75,4 @@ app.MapControllers();
 
 Log.Information("Game Store API is starting...");
 
-try
-{
-  app.Run();
-}
-catch (Exception ex)
-{
-  Log.Fatal(ex, "Application terminated unexpectedly");
-}
-finally
-{
-  Log.CloseAndFlush();
-}
+app.Run();

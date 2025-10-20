@@ -17,7 +17,7 @@ namespace GameStore.Infrastructure.Migrations
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "9.0.9");
 
-            modelBuilder.Entity("GameStore.Domain.Entities.Game", b =>
+            modelBuilder.Entity("GameStore.Domain.Aggregates.GameAggregate.Game", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -58,7 +58,7 @@ namespace GameStore.Infrastructure.Migrations
                     b.ToTable("Games", (string)null);
                 });
 
-            modelBuilder.Entity("GameStore.Domain.Entities.User", b =>
+            modelBuilder.Entity("GameStore.Domain.Aggregates.UserAggregate.User", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -75,6 +75,20 @@ namespace GameStore.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("TEXT");
 
+                    b.Property<string>("EmailConfirmationToken")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime?>("EmailConfirmationTokenExpiresAt")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime?>("EmailConfirmedAt")
+                        .HasColumnType("TEXT");
+
+                    b.Property<bool>("IsTemporaryPassword")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER")
+                        .HasDefaultValue(false);
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("TEXT");
@@ -83,6 +97,18 @@ namespace GameStore.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("TEXT")
                         .HasColumnName("PasswordHash");
+
+                    b.Property<string>("PasswordResetToken")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime?>("PasswordResetTokenExpiresAt")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("PendingEmail")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("PendingEmailToken")
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("ProfileType")
                         .IsRequired()

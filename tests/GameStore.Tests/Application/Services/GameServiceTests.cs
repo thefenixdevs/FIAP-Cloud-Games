@@ -1,10 +1,12 @@
-using GameStore.Application.DTOs;
-using GameStore.Application.Services;
-using GameStore.Domain.Entities;
-using GameStore.Domain.Repositories;
-using GameStore.Domain.Repositories.Abstractions;
+using FluentValidation;
+using GameStore.Application.Features.Games.DTOs;
+using GameStore.Application.Features.Games;
 using Microsoft.Extensions.Logging;
 using Moq;
+using Mapster;
+using GameStore.Domain.Aggregates.GameAggregate;
+using GameStore.Domain.Aggregates.GameAggregate.Repositories;
+using GameStore.Domain.SeedWork.Behavior;
 
 namespace GameStore.Tests.Application.Services;
 
@@ -13,6 +15,9 @@ public class GameServiceTests
   private readonly Mock<IGameRepository> _gameRepositoryMock;
   private readonly Mock<IUnitOfWork> _unitOfWorkMock;
   private readonly Mock<ILogger<GameService>> _loggerMock;
+  private readonly Mock<IValidator<CreateGameRequest>> _createGameValidatorMock;
+  private readonly Mock<IValidator<UpdateGameRequest>> _updateGameValidatorMock;
+  private readonly TypeAdapterConfig _mapperConfig;
   private readonly GameService _gameService;
 
   public GameServiceTests()
@@ -20,8 +25,24 @@ public class GameServiceTests
     _gameRepositoryMock = new Mock<IGameRepository>();
     _unitOfWorkMock = new Mock<IUnitOfWork>();
     _loggerMock = new Mock<ILogger<GameService>>();
+    _createGameValidatorMock = new Mock<IValidator<CreateGameRequest>>();
+    _updateGameValidatorMock = new Mock<IValidator<UpdateGameRequest>>();
+    _mapperConfig = new TypeAdapterConfig();
+    
     _unitOfWorkMock.SetupGet(x => x.Games).Returns(_gameRepositoryMock.Object);
-    _gameService = new GameService(_unitOfWorkMock.Object, _loggerMock.Object);
+    
+    // Configurar validators para sempre retornar sucesso
+    _createGameValidatorMock.Setup(x => x.ValidateAsync(It.IsAny<CreateGameRequest>(), It.IsAny<CancellationToken>()))
+      .ReturnsAsync(new FluentValidation.Results.ValidationResult());
+    _updateGameValidatorMock.Setup(x => x.ValidateAsync(It.IsAny<UpdateGameRequest>(), It.IsAny<CancellationToken>()))
+      .ReturnsAsync(new FluentValidation.Results.ValidationResult());
+    
+    _gameService = new GameService(
+      _unitOfWorkMock.Object, 
+      _loggerMock.Object, 
+      _mapperConfig,
+      _createGameValidatorMock.Object,
+      _updateGameValidatorMock.Object);
   }
 
   [Fact]
@@ -143,7 +164,7 @@ public class GameServiceTests
   {
     // Arrange
     var gameId = Guid.NewGuid();
-    var existingGame = new Game("Game to Delete", "Garbage Game", 0m, "None", null);
+    var existingGame = new Game("Game to Delete", "Garbage Game", 9.99m, "None", null);
     existingGame.Id = gameId;
     _gameRepositoryMock.Setup(r => r.GetByIdAsync(gameId)).ReturnsAsync(existingGame);
 

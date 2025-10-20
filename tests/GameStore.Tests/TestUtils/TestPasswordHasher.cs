@@ -1,4 +1,4 @@
-using GameStore.Domain.Security;
+using GameStore.Domain.Services.PasswordService;
 
 namespace GameStore.Tests.TestUtils;
 

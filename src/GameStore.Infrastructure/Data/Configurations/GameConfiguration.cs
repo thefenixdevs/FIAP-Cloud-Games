@@ -1,4 +1,4 @@
-﻿using GameStore.Domain.Entities;
+﻿using GameStore.Domain.Aggregates.GameAggregate;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 

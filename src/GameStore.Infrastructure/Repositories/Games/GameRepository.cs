@@ -1,5 +1,5 @@
-using GameStore.Domain.Entities;
-using GameStore.Domain.Repositories;
+using GameStore.Domain.Aggregates.GameAggregate;
+using GameStore.Domain.Aggregates.GameAggregate.Repositories;
 using GameStore.Infrastructure.Data;
 using GameStore.Infrastructure.Repositories.Abstractions;
 

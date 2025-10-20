@@ -1,13 +1,19 @@
-using GameStore.Application.DTOs;
-using GameStore.Application.Services;
-using GameStore.Domain.Entities;
-using GameStore.Domain.Enums;
-using GameStore.Domain.Repositories;
-using GameStore.Domain.Repositories.Abstractions;
-using GameStore.Domain.Security;
+using FluentValidation;
+using GameStore.Application.Features.Auth.DTOs;
+using GameStore.Application.Features.Users.DTOs;
+using GameStore.Application.Features.Auth;
+using GameStore.Application.Features.Auth.Interfaces;
 using GameStore.Tests.TestUtils;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Moq;
+using Mapster;
+using GameStore.Domain.Aggregates.UserAggregate;
+using GameStore.Domain.Aggregates.UserAggregate.Repositories;
+using GameStore.Domain.Aggregates.UserAggregate.ValueObjects;
+using GameStore.Domain.SeedWork.Behavior;
+using GameStore.Domain.Services.EmailService;
+using GameStore.Domain.Aggregates.UserAggregate.Enums;
 
 namespace GameStore.Tests.Application.Services;
 
@@ -16,21 +22,47 @@ public class AuthServiceTests
   private readonly Mock<IUserRepository> _userRepositoryMock;
   private readonly Mock<IUnitOfWork> _unitOfWorkMock;
   private readonly Mock<IJwtService> _jwtServiceMock;
+  private readonly Mock<IEmailService> _emailServiceMock;
+  private readonly Mock<IConfiguration> _configurationMock;
   private readonly Mock<ILogger<AuthService>> _loggerMock;
-  private readonly Mock<IPasswordHasher> _passwordHasherMock;
+  private readonly Mock<IValidator<RegisterRequest>> _registerValidatorMock;
+  private readonly Mock<IValidator<LoginRequest>> _loginValidatorMock;
+  private readonly TypeAdapterConfig _mapperConfig;
   private readonly AuthService _authService;
 
   public AuthServiceTests()
   {
+    // Configurar o PasswordService para os testes
+    Password.ConfigureService(new TestPasswordService());
+    
     _userRepositoryMock = new Mock<IUserRepository>();
     _unitOfWorkMock = new Mock<IUnitOfWork>();
     _jwtServiceMock = new Mock<IJwtService>();
+    _emailServiceMock = new Mock<IEmailService>();
+    _configurationMock = new Mock<IConfiguration>();
     _loggerMock = new Mock<ILogger<AuthService>>();
-    _passwordHasherMock = new Mock<IPasswordHasher>();
-    _passwordHasherMock.Setup(x => x.Hash(It.IsAny<string>())).Returns<string>(password => $"HASH::{password}");
-    _passwordHasherMock.Setup(x => x.Verify(It.IsAny<string>(), It.IsAny<string>())).Returns<string, string>((hash, password) => hash == $"HASH::{password}");
+    _registerValidatorMock = new Mock<IValidator<RegisterRequest>>();
+    _loginValidatorMock = new Mock<IValidator<LoginRequest>>();
+    _mapperConfig = new TypeAdapterConfig();
+    
     _unitOfWorkMock.SetupGet(x => x.Users).Returns(_userRepositoryMock.Object);
-    _authService = new AuthService(_unitOfWorkMock.Object, _jwtServiceMock.Object, _loggerMock.Object, _passwordHasherMock.Object);
+    _configurationMock.Setup(x => x["BaseUrl"]).Returns("http://localhost:5000");
+    
+    // Configurar validators para sempre retornar sucesso
+    _registerValidatorMock.Setup(x => x.ValidateAsync(It.IsAny<RegisterRequest>(), It.IsAny<CancellationToken>()))
+      .ReturnsAsync(new FluentValidation.Results.ValidationResult());
+    _loginValidatorMock.Setup(x => x.ValidateAsync(It.IsAny<LoginRequest>(), It.IsAny<CancellationToken>()))
+      .ReturnsAsync(new FluentValidation.Results.ValidationResult());
+    
+    _authService = new AuthService(
+      _unitOfWorkMock.Object,
+      _jwtServiceMock.Object,
+      _emailServiceMock.Object,
+      _loggerMock.Object,
+      _configurationMock.Object,
+      _mapperConfig,
+      _registerValidatorMock.Object,
+      _loginValidatorMock.Object);
   }
 
   [Fact]
@@ -45,10 +77,11 @@ public class AuthServiceTests
     var result = await _authService.RegisterAsync(request);
 
     Assert.True(result.Success);
-    Assert.Equal("User registered successfully", result.Message);
+    Assert.Contains("User registered successfully", result.Message);
     Assert.NotNull(result.UserId);
     _userRepositoryMock.Verify(x => x.AddAsync(It.IsAny<User>()), Times.Once);
     _unitOfWorkMock.Verify(x => x.CommitAsync(It.IsAny<CancellationToken>()), Times.Once);
+    _emailServiceMock.Verify(x => x.SendEmailConfirmationAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()), Times.Once);
   }
 
   [Fact]
@@ -96,7 +129,6 @@ public class AuthServiceTests
 
     Assert.NotNull(capturedUser);
     Assert.Equal("HASH::Password123!", capturedUser!.Password.Hash);
-    _passwordHasherMock.Verify(x => x.Hash(request.Password), Times.Once);
   }
 
   [Fact]
@@ -122,9 +154,8 @@ public class AuthServiceTests
     var result = await _authService.RegisterAsync(request);
 
     Assert.False(result.Success);
-    Assert.Contains("Password must be at least 8 characters long.", result.Message);
+    Assert.Contains("violação", result.Message);
     Assert.Null(result.UserId);
-    _passwordHasherMock.Verify(x => x.Hash(It.IsAny<string>()), Times.Never);
   }
 
   [Fact]
@@ -136,7 +167,6 @@ public class AuthServiceTests
     var expectedToken = "jwt-token";
 
     _userRepositoryMock.Setup(x => x.GetByEmailAsync(email)).ReturnsAsync(user);
-    _passwordHasherMock.Setup(x => x.Verify(user.Password.Hash, request.Password)).Returns(true);
     _jwtServiceMock.Setup(x => x.GenerateToken(user)).Returns(expectedToken);
 
     var result = await _authService.LoginAsync(request);
@@ -161,7 +191,6 @@ public class AuthServiceTests
     var expectedToken = "jwt-token";
 
     _userRepositoryMock.Setup(x => x.GetByUsernameAsync(username)).ReturnsAsync(user);
-    _passwordHasherMock.Setup(x => x.Verify(user.Password.Hash, request.Password)).Returns(true);
     _jwtServiceMock.Setup(x => x.GenerateToken(user)).Returns(expectedToken);
 
     var result = await _authService.LoginAsync(request);
@@ -200,7 +229,6 @@ public class AuthServiceTests
     var user = CreateActiveUser(email, "testuser", "CorrectPassword1!");
 
     _userRepositoryMock.Setup(x => x.GetByEmailAsync(email)).ReturnsAsync(user);
-    _passwordHasherMock.Setup(x => x.Verify(user.Password.Hash, request.Password)).Returns(false);
 
     var result = await _authService.LoginAsync(request);
 
@@ -218,7 +246,6 @@ public class AuthServiceTests
     user.BanAccount();
 
     _userRepositoryMock.Setup(x => x.GetByEmailAsync(email)).ReturnsAsync(user);
-    _passwordHasherMock.Setup(x => x.Verify(user.Password.Hash, request.Password)).Returns(true);
 
     var result = await _authService.LoginAsync(request);
 
@@ -235,7 +262,6 @@ public class AuthServiceTests
     var user = CreateUser(email, "testuser", request.Password);
 
     _userRepositoryMock.Setup(x => x.GetByEmailAsync(email)).ReturnsAsync(user);
-    _passwordHasherMock.Setup(x => x.Verify(user.Password.Hash, request.Password)).Returns(true);
 
     var result = await _authService.LoginAsync(request);
 
@@ -266,7 +292,6 @@ public class AuthServiceTests
     var user = CreateActiveUser(email, "testuser", request.Password);
 
     _userRepositoryMock.Setup(x => x.GetByEmailAsync(email)).ReturnsAsync(user);
-    _passwordHasherMock.Setup(x => x.Verify(user.Password.Hash, request.Password)).Returns(true);
     _jwtServiceMock.Setup(x => x.GenerateToken(user)).Returns("jwt-token");
 
     await _authService.LoginAsync(request);
@@ -283,7 +308,6 @@ public class AuthServiceTests
     user.BlockAccount();
 
     _userRepositoryMock.Setup(x => x.GetByEmailAsync(email)).ReturnsAsync(user);
-    _passwordHasherMock.Setup(x => x.Verify(user.Password.Hash, request.Password)).Returns(true);
 
     var result = await _authService.LoginAsync(request);
 
@@ -294,8 +318,7 @@ public class AuthServiceTests
 
   private static User CreateUser(string email, string username, string password, ProfileType profileType = ProfileType.CommonUser, string? name = null)
   {
-    var hasher = new TestPasswordHasher();
-    return User.Register(name ?? "Test User", email, username, password, hasher, profileType);
+    return User.Register(name ?? "Test User", email, username, password, profileType);
   }
 
   private static User CreateActiveUser(string email, string username, string password, ProfileType profileType = ProfileType.CommonUser, string? name = null)

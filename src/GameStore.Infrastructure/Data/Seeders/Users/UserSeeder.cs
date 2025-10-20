@@ -1,9 +1,8 @@
 using System.Threading;
 using System.Threading.Tasks;
-using GameStore.Domain.Entities;
-using GameStore.Domain.Enums;
-using GameStore.Domain.ValueObjects;
-using GameStore.Domain.Security;
+using GameStore.Domain.Aggregates.UserAggregate;
+using GameStore.Domain.Aggregates.UserAggregate.Enums;
+using GameStore.Domain.Aggregates.UserAggregate.ValueObjects;
 using GameStore.Infrastructure.Data;
 using GameStore.Infrastructure.Data.Seeders.Abstractions;
 using Microsoft.EntityFrameworkCore;
@@ -20,13 +19,11 @@ public class UserSeeder : IOrderedDataSeeder
 
   private readonly GameStoreContext _context;
   private readonly ILogger<UserSeeder> _logger;
-  private readonly IPasswordHasher _passwordHasher;
 
-  public UserSeeder(GameStoreContext context, ILogger<UserSeeder> logger, IPasswordHasher passwordHasher)
+  public UserSeeder(GameStoreContext context, ILogger<UserSeeder> logger)
   {
     _context = context;
     _logger = logger;
-    _passwordHasher = passwordHasher;
   }
 
   public int Order => 0;
@@ -45,7 +42,9 @@ public class UserSeeder : IOrderedDataSeeder
       return;
     }
 
-    var adminUser = User.Register(AdminName, AdminEmail, AdminUsername, AdminPassword, _passwordHasher, ProfileType.Admin);
+    var adminUser = User.Register(AdminName, AdminEmail, AdminUsername, AdminPassword, ProfileType.Admin);
+    adminUser.GenerateEmailConfirmationToken();
+    adminUser.ConfirmEmail(adminUser.EmailConfirmationToken!);
     adminUser.ConfirmAccount();
 
     await _context.Users.AddAsync(adminUser, cancellationToken);

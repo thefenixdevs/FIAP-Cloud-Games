@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
-using GameStore.Domain.Entities;
+using GameStore.Domain.Aggregates.UserAggregate;
+using GameStore.Domain.Aggregates.GameAggregate;
 
 namespace GameStore.Infrastructure.Data;
 

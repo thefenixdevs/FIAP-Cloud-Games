@@ -1,0 +1,45 @@
+<mjml>
+  <mj-head>
+    <mj-title>Confirmação de Troca de E-mail - Game Store</mj-title>
+    <mj-attributes>
+      <mj-all font-family="Arial, sans-serif" />
+      <mj-text color="#333333" font-size="14px" line-height="20px" />
+      <mj-button background-color="#FF9800" color="#ffffff" font-size="16px" font-weight="bold" border-radius="5px" />
+    </mj-attributes>
+  </mj-head>
+  <mj-body background-color="#f4f4f4">
+    <mj-section background-color="#ffffff" padding="20px">
+      <mj-column>
+        <mj-text font-size="24px" font-weight="bold" color="#FF9800" align="center" padding-bottom="20px">
+          Game Store
+        </mj-text>
+        <mj-divider border-color="#FF9800" border-width="2px" />
+        <mj-text font-size="20px" font-weight="bold" padding-top="20px">
+          Olá, {{UserName}}!
+        </mj-text>
+        <mj-text padding-top="10px">
+          Recebemos uma solicitação para alterar o e-mail da sua conta na Game Store para <strong>{{NewEmail}}</strong>. Se você fez esta solicitação, clique no botão abaixo para confirmar a alteração:
+        </mj-text>
+        <mj-button href="{{ConfirmationLink}}" padding-top="20px">
+          Confirmar Troca de E-mail
+        </mj-button>
+        <mj-text padding-top="20px" font-size="12px" color="#666666">
+          Ou copie e cole este link no seu navegador:
+        </mj-text>
+        <mj-text font-size="12px" color="#FF9800" padding-top="5px">
+          {{ConfirmationLink}}
+        </mj-text>
+        <mj-text padding-top="20px" font-size="12px" color="#d32f2f">
+          Este link não expira, mas só pode ser usado uma vez.
+        </mj-text>
+        <mj-divider border-color="#e0e0e0" border-width="1px" padding-top="30px" />
+        <mj-text font-size="12px" color="#999999" align="center" padding-top="10px">
+          Se você não solicitou a troca de e-mail, ignore este email. Seu e-mail atual permanecerá inalterado.
+        </mj-text>
+        <mj-text font-size="12px" color="#999999" align="center">
+          © 2025 Game Store. Todos os direitos reservados.
+        </mj-text>
+      </mj-column>
+    </mj-section>
+  </mj-body>
+</mjml>

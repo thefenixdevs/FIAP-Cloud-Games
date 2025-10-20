@@ -1,6 +1,6 @@
-using GameStore.Domain.Entities;
-using GameStore.Domain.Repositories;
-using GameStore.Domain.ValueObjects;
+using GameStore.Domain.Aggregates.UserAggregate;
+using GameStore.Domain.Aggregates.UserAggregate.Repositories;
+using GameStore.Domain.Aggregates.UserAggregate.ValueObjects;
 using GameStore.Infrastructure.Data;
 using GameStore.Infrastructure.Repositories.Abstractions;
 using Microsoft.EntityFrameworkCore;
@@ -19,27 +19,18 @@ public class UserRepository : EFRepository<User>, IUserRepository
 
   public async Task<User?> GetByEmailAsync(string email)
   {
-    var normalizedEmail = Email.Create(email);
-    return await _context.Users.FirstOrDefaultAsync(u => u.Email == normalizedEmail);
+    return await _context.Users.FirstOrDefaultAsync(u => u.Email == email);
   }
 
   public async Task<User?> GetByUsernameAsync(string username)
   {
-    var normalizedUsername = UsernameNormalizer.NormalizeForComparison(username);
-    return await _context.Users.FirstOrDefaultAsync(
-      u => u.Username.ToLower() == normalizedUsername);
+    
+    return await _context.Users.FirstOrDefaultAsync( u => u.Username == username);
   }
 
-  public async Task<bool> ExistsByEmailAsync(string email)
-  {
-    var normalizedEmail = Email.Create(email);
-    return await _context.Users.AnyAsync(u => u.Email == normalizedEmail);
-  }
+  public async Task<bool> ExistsByEmailAsync(string email) =>
+    await _context.Users.AnyAsync(u => u.Email == email);
 
-  public async Task<bool> ExistsByUsernameAsync(string username)
-  {
-    var normalizedUsername = UsernameNormalizer.NormalizeForComparison(username);
-    return await _context.Users.AnyAsync(
-      u => u.Username.ToLower() == normalizedUsername);
-  }
+  public async Task<bool> ExistsByUsernameAsync(string username) =>
+    await _context.Users.AnyAsync(u => u.Username == username);
 }

@@ -1,7 +1,7 @@
+using GameStore.Application.Features.Games.DTOs;
+using GameStore.Application.Features.Games.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using GameStore.Application.DTOs;
-using GameStore.Application.Services;
 
 namespace GameStore.API.Controllers;
 
@@ -12,7 +12,9 @@ public class GamesController : ControllerBase
     private readonly IGameService _gameService;
     private readonly ILogger<GamesController> _logger;
 
-    public GamesController(IGameService gameService, ILogger<GamesController> logger)
+    public GamesController(
+        IGameService gameService,
+        ILogger<GamesController> logger)
     {
         _gameService = gameService;
         _logger = logger;
@@ -20,6 +22,10 @@ public class GamesController : ControllerBase
 
     [HttpGet]
     [Authorize(Policy = "ConfirmedCommonUser")]
+    /// <summary>
+    /// Lista jogos.
+    /// </summary>
+    [ProducesResponseType(typeof(IEnumerable<GameResponse>), StatusCodes.Status200OK)]
     public async Task<ActionResult<IEnumerable<GameResponse>>> GetGames()
     {
         var games = await _gameService.GetAllGamesAsync();
@@ -28,6 +34,11 @@ public class GamesController : ControllerBase
 
     [HttpGet("{id}")]
     [Authorize(Policy = "ConfirmedCommonUser")]
+    /// <summary>
+    /// Obtém jogo por Id.
+    /// </summary>
+    [ProducesResponseType(typeof(GameResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     public async Task<ActionResult<GameResponse>> GetGame(Guid id)
     {
         var game = await _gameService.GetGameByIdAsync(id);
@@ -42,18 +53,13 @@ public class GamesController : ControllerBase
 
     [HttpPost]
     [Authorize(Policy = "ConfirmedAdmin")]
+    /// <summary>
+    /// Cria jogo (apenas admin).
+    /// </summary>
+    [ProducesResponseType(typeof(GameResponse), StatusCodes.Status201Created)]
+    [ProducesResponseType(typeof(object), StatusCodes.Status400BadRequest)]
     public async Task<ActionResult<GameResponse>> CreateGame([FromBody] CreateGameRequest request)
     {
-        if (string.IsNullOrWhiteSpace(request.Title))
-        {
-            return BadRequest(new { message = "Title is required" });
-        }
-
-        if (request.Price < 0)
-        {
-            return BadRequest(new { message = "Price cannot be negative" });
-        }
-
         var (success, message, game) = await _gameService.CreateGameAsync(request);
 
         if (!success || game == null)
@@ -65,19 +71,14 @@ public class GamesController : ControllerBase
     }
 
     [HttpPut("{id}")]
-    [Authorize]
+    [Authorize(Policy = "ConfirmedAdmin")]
+    /// <summary>
+    /// Atualiza jogo (apenas admin).
+    /// </summary>
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(typeof(object), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> UpdateGame(Guid id, [FromBody] UpdateGameRequest request)
     {
-        if (string.IsNullOrWhiteSpace(request.Title))
-        {
-            return BadRequest(new { message = "Title is required" });
-        }
-
-        if (request.Price < 0)
-        {
-            return BadRequest(new { message = "Price cannot be negative" });
-        }
-
         var (success, message) = await _gameService.UpdateGameAsync(id, request);
 
         if (!success)
@@ -89,7 +90,12 @@ public class GamesController : ControllerBase
     }
 
     [HttpDelete("{id}")]
-    [Authorize]
+    [Authorize(Policy = "ConfirmedAdmin")]
+    /// <summary>
+    /// Exclui jogo (apenas admin).
+    /// </summary>
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(typeof(object), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> DeleteGame(Guid id)
     {
         var (success, message) = await _gameService.DeleteGameAsync(id);

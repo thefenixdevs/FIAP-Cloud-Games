@@ -1,0 +1,43 @@
+<mjml>
+  <mj-head>
+    <mj-title>Confirme seu Email - Game Store</mj-title>
+    <mj-attributes>
+      <mj-all font-family="Arial, sans-serif" />
+      <mj-text color="#333333" font-size="14px" line-height="20px" />
+      <mj-button background-color="#4CAF50" color="#ffffff" font-size="16px" font-weight="bold" border-radius="5px" />
+    </mj-attributes>
+  </mj-head>
+  <mj-body background-color="#f4f4f4">
+    <mj-section background-color="#ffffff" padding="20px">
+      <mj-column>
+        <mj-text font-size="24px" font-weight="bold" color="#4CAF50" align="center" padding-bottom="20px">
+          Game Store
+        </mj-text>
+        <mj-divider border-color="#4CAF50" border-width="2px" />
+        <mj-text font-size="20px" font-weight="bold" padding-top="20px">
+          Olá, {{UserName}}!
+        </mj-text>
+        <mj-text padding-top="10px">
+          Obrigado por se cadastrar na Game Store! Para completar seu cadastro e começar a explorar nossa plataforma, confirme seu endereço de email clicando no botão abaixo:
+        </mj-text>
+        <mj-button href="{{ConfirmationLink}}" padding-top="20px">
+          Confirmar Email
+        </mj-button>
+        <mj-text padding-top="20px" font-size="12px" color="#666666">
+          Ou copie e cole este link no seu navegador:
+        </mj-text>
+        <mj-text font-size="12px" color="#4CAF50" padding-top="5px">
+          {{ConfirmationLink}}
+        </mj-text>
+        <mj-divider border-color="#e0e0e0" border-width="1px" padding-top="30px" />
+        <mj-text font-size="12px" color="#999999" align="center" padding-top="10px">
+          Se você não criou esta conta, ignore este email.
+        </mj-text>
+        <mj-text font-size="12px" color="#999999" align="center">
+          © 2025 Game Store. Todos os direitos reservados.
+        </mj-text>
+      </mj-column>
+    </mj-section>
+  </mj-body>
+</mjml>
+
