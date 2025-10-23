@@ -14,13 +14,17 @@ public class AuthService : IAuthService
   private readonly IJwtService _jwtService;
   private readonly ILogger<AuthService> _logger;
   private readonly IPasswordHasher _passwordHasher;
+  private readonly IEmailService _emailService;
+  private readonly IEncriptService _encriptService;
 
-  public AuthService(IUnitOfWork unitOfWork, IJwtService jwtService, ILogger<AuthService> logger, IPasswordHasher passwordHasher)
+  public AuthService(IUnitOfWork unitOfWork, IJwtService jwtService, ILogger<AuthService> logger, IPasswordHasher passwordHasher, IEmailService emailService, IEncriptService encriptService)
   {
     _unitOfWork = unitOfWork;
     _jwtService = jwtService;
     _logger = logger;
     _passwordHasher = passwordHasher;
+    _emailService = emailService;
+    _encriptService = encriptService;
   }
 
   public async Task<(bool Success, string Message, Guid? UserId)> RegisterAsync(RegisterRequest request)
@@ -44,6 +48,17 @@ public class AuthService : IAuthService
       await _unitOfWork.Users.AddAsync(user);
       await _unitOfWork.CommitAsync();
 
+      var masked = _encriptService.EncodeMaskedCode(request.Email);
+      var confirmationLink = $"https://localhost:7055/api/Auth/ValidationAccount?code={masked}";
+      var htmlBody = _emailService.TemplateEmailConfirmation(confirmationLink);
+
+      await _emailService.SendConfirmationEmailAsync(
+          request.Email,
+          "Confirmação de conta",
+          htmlBody
+      );
+
+      _logger.LogInformation("Confirmation email sent to {Email}", user.Email);
       _logger.LogInformation("User {Username} registered successfully with ID {UserId}", user.Username, user.Id);
       return (true, "UserRegisteredSuccessfully", user.Id);
     }
@@ -126,6 +141,73 @@ public class AuthService : IAuthService
     {
       _logger.LogError(ex, "Error during user login for identifier {Identifier}", request.Identifier);
       return (false, "AuthService.LoginAsync.AnErrorOccurredDuringLogin", null);
+    }
+  }
+
+  public async Task<(bool Success, string Message, ValidationNotificationResponse? Response)> SendAccountConfirmationAsync(ValidationNotificationRequest request)
+  {
+    User? user = null;
+
+    if (request is null || string.IsNullOrWhiteSpace(request.Email))
+      return (false, "E-mail is required", null);
+
+    try
+    {
+      user = await _unitOfWork.Users.GetByEmailAsync(request.Email);
+      if (user == null)
+        return (false, "User not found", null);
+
+      var masked = _encriptService.EncodeMaskedCode(request.Email);
+      var confirmationLink = $"https://localhost:7055/api/Auth/ValidationAccount?code={masked}";
+      var htmlBody = _emailService.TemplateEmailConfirmation(confirmationLink);
+
+      await _emailService.SendConfirmationEmailAsync(
+          user.Email,
+          "Confirmação de conta",
+          htmlBody
+      );
+
+      _logger.LogInformation("Confirmation email sent to {Email}", user.Email);
+      return (true, "Confirmation email sent successfully", null);
+    }
+    catch (Exception ex)
+    {
+      _logger.LogError(ex, "Error while sending confirmation e-mail for {Email}", request.Email);
+      return (false, "Failed to send confirmation e-mail", null);
+    }
+  }
+
+  public async Task<(bool Success, string Message, ValidationAccountResponse? Response)> ValidationAccountAsync(ValidationAccountRequest request)
+  {
+    User? user = null;
+
+    if (request is null || string.IsNullOrWhiteSpace(request.Email))
+      return (false, "E-mail is required", null);
+
+    try
+    {
+      user = await _unitOfWork.Users.GetByEmailAsync(request.Email);
+      if (user == null)
+        return (false, "User not found", null);
+
+      if (user.AccountStatus == AccountStatus.Active)
+        return (false, "Account already confirmed", null);
+
+      if (DateTime.Now > request.Expiration.AddMinutes(15))
+        return (false, "Activation link expired", null);
+
+      user = User.Update(user, user.Name, user.Email, user.Username, AccountStatus.Active, user.ProfileType);
+
+      await _unitOfWork.Users.UpdateAsync(user);
+      await _unitOfWork.CommitAsync();
+
+      _logger.LogInformation("Account {Email} successfully confirmed", user.Email);
+      return (true, "Account confirmed successfully", null);
+    }
+    catch (Exception ex)
+    {
+      _logger.LogError(ex, "Error during account validation for {Email}", request.Email);
+      return (false, "An error occurred during account validation", null);
     }
   }
 }
