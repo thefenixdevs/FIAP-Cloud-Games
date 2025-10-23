@@ -71,7 +71,7 @@ public class UsersController : ControllerBase
     }
 
     [HttpPut("{id}")]
-    [Authorize]
+    [Authorize(Policy = "ConfirmedAdmin")]
     public async Task<IActionResult> UpdateUser(Guid id, [FromBody] UpdateUserRequest request)
     {
         if (string.IsNullOrWhiteSpace(request.Name))
@@ -100,7 +100,7 @@ public class UsersController : ControllerBase
     }
 
     [HttpDelete("{id}")]
-    [Authorize]
+    [Authorize(Policy = "ConfirmedAdmin")]
     public async Task<IActionResult> DeleteUser(Guid id)
     {
         var (success, message) = await _userService.DeleteUserAsync(id);

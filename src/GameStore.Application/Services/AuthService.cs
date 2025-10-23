@@ -47,6 +47,11 @@ public class AuthService : IAuthService
       _logger.LogInformation("User {Username} registered successfully with ID {UserId}", user.Username, user.Id);
       return (true, "User registered successfully", user.Id);
     }
+    catch (ArgumentException ex) when (ex.ParamName == "email")
+    {
+        _logger.LogWarning("Registration failed: Invalid email address {Email}", request.Email);
+        return (false, ex.Message, null);
+    }
     catch (ArgumentException ex) when (ex.ParamName == "password")
     {
       _logger.LogWarning("Registration failed: Invalid password requirements for email {Email}", request.Email);
