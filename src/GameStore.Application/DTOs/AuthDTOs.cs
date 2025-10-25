@@ -6,6 +6,10 @@ public record RegisterRequest(string Name, string Email, string Username, string
 
 public record LoginRequest(string Identifier, string Password);
 
+public record ValidationNotificationRequest(string Email);
+
+public record ValidationAccountRequest(string? Email, DateTime Expiration);
+
 public record LoginResponse(
     Guid UserId,
     string Username,
@@ -21,3 +25,14 @@ public record UserResponse(
     ProfileType ProfileType,
     AccountStatus AccountStatus,
     DateTime CreatedAt);
+
+public record ValidationAccountResponse(
+    Guid Id,
+    string Username,
+    string Email,
+    AccountStatus AccountStatus);
+
+public record ValidationNotificationResponse(
+    Guid Id,
+    AccountStatus AccountStatus,
+    DateTime? ConfirmedAt);
