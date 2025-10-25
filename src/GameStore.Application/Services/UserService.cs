@@ -1,6 +1,5 @@
 using GameStore.Application.DTOs;
 using GameStore.Domain.Entities;
-using GameStore.Domain.Enums;
 using GameStore.Domain.Repositories.Abstractions;
 using GameStore.Domain.Security;
 using Microsoft.Extensions.Logging;

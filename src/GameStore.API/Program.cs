@@ -1,6 +1,7 @@
 using GameStore.API.Authorization;
 using GameStore.API.Middleware;
 using GameStore.CrossCutting.DependencyInjection;
+using GameStore.CrossCutting.Localization;
 using GameStore.Infrastructure.Data.Initialization;
 using Microsoft.AspNetCore.Authorization;
 using Serilog;
@@ -33,6 +34,8 @@ builder.Services.AddSingleton<IAuthorizationHandler, ConfirmedAdminHandler>();
 builder.Services.AddInfrastructure(builder.Configuration);
 // DI da camada Application (serviços, casos de uso, etc)
 builder.Services.AddApplication();
+// Configuração de localização
+builder.Services.AddCustomLocalization(builder.Configuration);
 
 var app = builder.Build();
 

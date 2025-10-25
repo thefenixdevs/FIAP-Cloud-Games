@@ -1,5 +1,6 @@
 using GameStore.Application.DTOs;
 using GameStore.Application.Services;
+using GameStore.CrossCutting.Localization;
 using Microsoft.AspNetCore.Mvc;
 
 
@@ -11,11 +12,13 @@ public class AuthController : ControllerBase
 {
   private readonly IAuthService _authService;
   private readonly ILogger<AuthController> _logger;
+  private readonly ITranslationService _translator;
 
-  public AuthController(IAuthService authService, ILogger<AuthController> logger)
+  public AuthController(IAuthService authService, ILogger<AuthController> logger, ITranslationService translator)
   {
     _authService = authService;
     _logger = logger;
+    _translator = translator;
   }
 
   [HttpPost("register")]
@@ -28,12 +31,12 @@ public class AuthController : ControllerBase
         string.IsNullOrWhiteSpace(request.Username) ||
         string.IsNullOrWhiteSpace(request.Password))
     {
-      return BadRequest(new { message = "All fields are required" });
+      return BadRequest(new { message = _translator.Translate("Auth.Register.AllfieldsAreRequired") });
     }
 
     if (request.Password.Length < 8)
     {
-      return BadRequest(new { message = "Password must be at least 8 characters long" });
+      return BadRequest(new { message = _translator.Translate("Auth.Register.PasswordMustBeAtLeast8CharactersLong") });
     }
 
     var (success, message, userId) = await _authService.RegisterAsync(request);
@@ -53,7 +56,7 @@ public class AuthController : ControllerBase
 
     if (string.IsNullOrWhiteSpace(request.Identifier) || string.IsNullOrWhiteSpace(request.Password))
     {
-      return BadRequest(new { message = "Identifier and password are required" });
+      return BadRequest(new { message = _translator.Translate("Auth.Login.IdentifierAndPasswordAreRequired") });
     }
 
     var (success, message, response) = await _authService.LoginAsync(request);

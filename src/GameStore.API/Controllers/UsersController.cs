@@ -1,8 +1,8 @@
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
 using GameStore.Application.DTOs;
 using GameStore.Application.Services;
-using Microsoft.AspNetCore.Http.HttpResults;
+using GameStore.CrossCutting.Localization;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 
 namespace GameStore.API.Controllers;
 
@@ -12,11 +12,13 @@ public class UsersController : ControllerBase
 {
     private readonly IUserService _userService;
     private readonly ILogger<UsersController> _logger;
+    private readonly ITranslationService _translator;
 
-    public UsersController(IUserService userService, ILogger<UsersController> logger)
+    public UsersController(IUserService userService, ILogger<UsersController> logger, ITranslationService translator)
     {
         _userService = userService;
         _logger = logger;
+        _translator = translator;
     }
 
     [HttpGet]
@@ -35,7 +37,7 @@ public class UsersController : ControllerBase
 
         if (user == null)
         {
-            return NotFound(new { message = "User not found" });
+            return NotFound(new { message = _translator.Translate("Users.GetById.UserNotFound") });
         }
 
         return Ok(user);
@@ -47,17 +49,17 @@ public class UsersController : ControllerBase
     {
         if (string.IsNullOrWhiteSpace(request.Name))
         {
-            return BadRequest(new { message = "Name is required" });
+            return BadRequest(new { message = _translator.Translate("Users.CreateUpdateUser.NameIsRequired") });
         }
 
         if (string.IsNullOrWhiteSpace(request.Email))
         {
-            return BadRequest(new { message = "Email is required" });
+            return BadRequest(new { message = _translator.Translate("Users.CreateUpdateUser.EmailIsRequired") });
         }
 
         if (string.IsNullOrWhiteSpace(request.Username))
         {
-            return BadRequest(new { message = "Username is required" });
+            return BadRequest(new { message = _translator.Translate("Users.CreateUpdateUser.UsernameIsRequired") });
         }
 
         var (success, message, user) = await _userService.CreateUserAsync(request);
@@ -76,17 +78,17 @@ public class UsersController : ControllerBase
     {
         if (string.IsNullOrWhiteSpace(request.Name))
         {
-            return BadRequest(new { message = "Name is required" });
+            return BadRequest(new { message = _translator.Translate("Users.CreateUpdateUser.NameIsRequired") });
         }
 
         if (string.IsNullOrWhiteSpace(request.Email))
         {
-            return BadRequest(new { message = "Email is required" });
+            return BadRequest(new { message = _translator.Translate("Users.CreateUpdateUser.EmailIsRequired") });
         }
 
         if (string.IsNullOrWhiteSpace(request.Username))
         {
-            return BadRequest(new { message = "Username is required" });
+            return BadRequest(new { message = _translator.Translate("Users.CreateUpdateUser.UsernameIsRequired") });
         }
 
         var (success, message) = await _userService.UpdateUserAsync(id, request);
