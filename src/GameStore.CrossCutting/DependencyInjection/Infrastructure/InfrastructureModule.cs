@@ -1,3 +1,4 @@
+using GameStore.Application.Services;
 using GameStore.Domain.Repositories;
 using GameStore.Domain.Repositories.Abstractions;
 using GameStore.Domain.Security;
@@ -30,6 +31,8 @@ public static class InfrastructureModule
     services.AddScoped<IDataSeeder, UserSeeder>();
     services.AddScoped<DataSeederOrchestrator>();
     services.AddScoped<IPasswordHasher, BCryptPasswordHasher>();
+    services.AddScoped<IEmailService, EmailService>();
+    services.AddScoped<IEncriptService, EncriptService>();
 
     return services;
   }
