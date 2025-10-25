@@ -1,7 +1,8 @@
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
 using GameStore.Application.DTOs;
 using GameStore.Application.Services;
+using GameStore.CrossCutting.Localization;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 
 namespace GameStore.API.Controllers;
 
@@ -11,11 +12,13 @@ public class GamesController : ControllerBase
 {
     private readonly IGameService _gameService;
     private readonly ILogger<GamesController> _logger;
+    private readonly ITranslationService _translator;
 
-    public GamesController(IGameService gameService, ILogger<GamesController> logger)
+    public GamesController(IGameService gameService, ILogger<GamesController> logger, ITranslationService translator)
     {
         _gameService = gameService;
         _logger = logger;
+        _translator = translator;
     }
 
     [HttpGet]
@@ -34,7 +37,7 @@ public class GamesController : ControllerBase
 
         if (game == null)
         {
-            return NotFound(new { message = "Game not found" });
+            return NotFound(new { message = _translator.Translate("GameNotFound") });
         }
 
         return Ok(game);
@@ -46,19 +49,20 @@ public class GamesController : ControllerBase
     {
         if (string.IsNullOrWhiteSpace(request.Title))
         {
-            return BadRequest(new { message = "Title is required" });
+            return BadRequest(new { message = _translator.Translate("Games.CreateUpdateGame.TitleIsRequired") });
         }
 
         if (request.Price < 0)
         {
-            return BadRequest(new { message = "Price cannot be negative" });
+            return BadRequest(new { message = _translator.Translate("Game.CreateUpdateGame.PriceCannotBeNegative") });
         }
 
         var (success, message, game) = await _gameService.CreateGameAsync(request);
+        string translatedMessage = _translator.Translate(message);
 
         if (!success || game == null)
         {
-            return BadRequest(new { message });
+            return BadRequest(new { message = translatedMessage });
         }
 
         return CreatedAtAction(nameof(GetGame), new { id = game.Id }, game);
@@ -70,19 +74,20 @@ public class GamesController : ControllerBase
     {
         if (string.IsNullOrWhiteSpace(request.Title))
         {
-            return BadRequest(new { message = "Title is required" });
+            return BadRequest(new { message = _translator.Translate("Games.CreateUpdateGame.TitleIsRequired") });
         }
 
         if (request.Price < 0)
         {
-            return BadRequest(new { message = "Price cannot be negative" });
+            return BadRequest(new { message = _translator.Translate("Game.CreateUpdateGame.PriceCannotBeNegative") });
         }
 
         var (success, message) = await _gameService.UpdateGameAsync(id, request);
+        string translatedMessage = _translator.Translate(message);
 
         if (!success)
         {
-            return NotFound(new { message });
+            return NotFound(new { message = translatedMessage });
         }
 
         return NoContent();
@@ -93,10 +98,11 @@ public class GamesController : ControllerBase
     public async Task<IActionResult> DeleteGame(Guid id)
     {
         var (success, message) = await _gameService.DeleteGameAsync(id);
+        string translatedMessage = _translator.Translate(message);
 
         if (!success)
         {
-            return NotFound(new { message });
+            return NotFound(new { message = translatedMessage });
         }
 
         return NoContent();

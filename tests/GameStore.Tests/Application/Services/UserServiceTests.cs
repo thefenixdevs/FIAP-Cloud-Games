@@ -101,6 +101,9 @@ public class UserServiceTests
 
     // Assert
     Assert.NotNull(result);
+    Assert.True(result.Success);
+    Assert.Equal("UserRegisteredSuccessfully", result.Message);
+    Assert.NotNull(result.User);
     Assert.Equal(createUserRequest.Name, result.User.Name);
     Assert.Equal(createUserRequest.Email, result.User.Email);
     Assert.Equal(createUserRequest.Username, result.User.Username);
@@ -123,6 +126,7 @@ public class UserServiceTests
 
     // Assert
     Assert.True(result.Success);
+    Assert.Equal("UserUpdatedSuccessfully", result.Message);
     Assert.Equal(updateUserRequest.Name, existingUser.Name);
     Assert.Equal(updateUserRequest.Email, existingUser.Email);
     Assert.Equal(updateUserRequest.Username, existingUser.Username);
@@ -144,6 +148,7 @@ public class UserServiceTests
 
     // Assert
     Assert.False(result.Success);
+    Assert.Equal("UserNotFound", result.Message);
     _unitOfWorkMock.Verify(u => u.Users.UpdateAsync(It.IsAny<User>()), Times.Never);
   }
 
@@ -161,6 +166,7 @@ public class UserServiceTests
 
     // Assert
     Assert.True(result.Success);
+    Assert.Equal("UserDeletedSuccessfully", result.Message);
     _userRepositoryMock.Verify(r => r.GetByIdAsync(It.IsAny<Guid>()), Times.Once);
     _unitOfWorkMock.Verify(r => r.Users.DeleteAsync(It.IsAny<Guid>()), Times.Once);
   }
@@ -177,6 +183,7 @@ public class UserServiceTests
 
     // Assert
     Assert.False(result.Success);
+    Assert.Equal("UserNotFound", result.Message);
     _userRepositoryMock.Verify(r => r.GetByIdAsync(It.IsAny<Guid>()), Times.Once);
     _unitOfWorkMock.Verify(u => u.Users.DeleteAsync(It.IsAny<Guid>()), Times.Never);
   }
