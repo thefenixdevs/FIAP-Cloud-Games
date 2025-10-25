@@ -18,6 +18,8 @@ public class AuthServiceTests
   private readonly Mock<IJwtService> _jwtServiceMock;
   private readonly Mock<ILogger<AuthService>> _loggerMock;
   private readonly Mock<IPasswordHasher> _passwordHasherMock;
+  private readonly Mock<IEmailService> _emailServiceMock;
+  private readonly Mock<IEncriptService> _encriptServiceMock;
   private readonly AuthService _authService;
 
   public AuthServiceTests()
@@ -27,10 +29,18 @@ public class AuthServiceTests
     _jwtServiceMock = new Mock<IJwtService>();
     _loggerMock = new Mock<ILogger<AuthService>>();
     _passwordHasherMock = new Mock<IPasswordHasher>();
+    _emailServiceMock = new Mock<IEmailService>();
+    _encriptServiceMock = new Mock<IEncriptService>();
     _passwordHasherMock.Setup(x => x.Hash(It.IsAny<string>())).Returns<string>(password => $"HASH::{password}");
     _passwordHasherMock.Setup(x => x.Verify(It.IsAny<string>(), It.IsAny<string>())).Returns<string, string>((hash, password) => hash == $"HASH::{password}");
     _unitOfWorkMock.SetupGet(x => x.Users).Returns(_userRepositoryMock.Object);
-    _authService = new AuthService(_unitOfWorkMock.Object, _jwtServiceMock.Object, _loggerMock.Object, _passwordHasherMock.Object);
+    _authService = new AuthService(
+        _unitOfWorkMock.Object, 
+        _jwtServiceMock.Object, 
+        _loggerMock.Object, 
+        _passwordHasherMock.Object,
+        _emailServiceMock.Object,
+        _encriptServiceMock.Object);
   }
 
   [Fact]
