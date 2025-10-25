@@ -73,9 +73,6 @@ public class AuthController : ControllerBase
     return Ok(new { message });
   }
 
-    return Ok(new { message = translatedMessage });
-  }
-
   [HttpPost("sendConfirmation")]
   public async Task<IActionResult> SendConfirmation([FromBody] ValidationNotificationRequest request)
   {
