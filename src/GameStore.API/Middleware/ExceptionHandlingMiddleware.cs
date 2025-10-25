@@ -1,3 +1,4 @@
+using GameStore.CrossCutting.Localization;
 using System.Net;
 using System.Security;
 using System.Text.Json;
@@ -8,11 +9,13 @@ namespace GameStore.API.Middleware
     {
         private readonly RequestDelegate _next;
         private readonly ILogger<ExceptionHandlingMiddleware> _logger;
+        private readonly ITranslationService _translator;
 
-        public ExceptionHandlingMiddleware(RequestDelegate next, ILogger<ExceptionHandlingMiddleware> logger)
+        public ExceptionHandlingMiddleware(RequestDelegate next, ILogger<ExceptionHandlingMiddleware> logger, ITranslationService translator)
         {
             _next = next;
             _logger = logger;
+            _translator = translator;
         }
 
         public async Task InvokeAsync(HttpContext context)
@@ -30,11 +33,11 @@ namespace GameStore.API.Middleware
             // Captura falhas de autenticação/autorização que não lançam exceção
             if (context.Response.StatusCode == (int)HttpStatusCode.Unauthorized && !context.Response.HasStarted)
             {
-                await WriteJsonResponse(context, HttpStatusCode.Unauthorized, "Unauthenticated user.");
+                await WriteJsonResponse(context, HttpStatusCode.Unauthorized, _translator.Translate("ExceptionHandlingMiddleware.UnauthenticatedUser"));
             }
             else if (context.Response.StatusCode == (int)HttpStatusCode.Forbidden && !context.Response.HasStarted)
             {
-                await WriteJsonResponse(context, HttpStatusCode.Forbidden, "Unauthorized user.");
+                await WriteJsonResponse(context, HttpStatusCode.Forbidden, _translator.Translate("ExceptionHandlingMiddleware.UnauthorizedUser"));
             }
         }
 

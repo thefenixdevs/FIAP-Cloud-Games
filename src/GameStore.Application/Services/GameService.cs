@@ -57,12 +57,12 @@ public class GameService : IGameService
       await _unitOfWork.CommitAsync();
 
       _logger.LogInformation("Game created successfully with ID: {GameId}", game.Id);
-      return (true, "Game created successfully", MapToResponse(game));
+      return (true, "GameService.CreateGameAsync.GameCreatedSuccessfully", MapToResponse(game));
     }
     catch (Exception ex)
     {
       _logger.LogError(ex, "Error creating game: {Title}", request.Title);
-      return (false, "An error occurred while creating the game", null);
+      return (false, "GameService.CreateGameAsync.AnErrorOccurredWhileCreatingTheGame", null);
     }
   }
 
@@ -76,7 +76,7 @@ public class GameService : IGameService
       if (game is null)
       {
         _logger.LogWarning("Game with ID {GameId} not found", id);
-        return (false, "Game not found");
+        return (false, "GameNotFound");
       }
 
       game.Update(
@@ -91,12 +91,12 @@ public class GameService : IGameService
       await _unitOfWork.CommitAsync();
 
       _logger.LogInformation("Game with ID {GameId} updated successfully", id);
-      return (true, "Game updated successfully");
+      return (true, "GameUpdatedSuccessfully");
     }
     catch (Exception ex)
     {
       _logger.LogError(ex, "Error updating game with ID: {GameId}", id);
-      return (false, "An error occurred while updating the game");
+      return (false, "GameService.UpdateGameAsync.AnErrorOccurredWhileUpdatingTheGame");
     }
   }
 
@@ -110,19 +110,19 @@ public class GameService : IGameService
       if (game is null)
       {
         _logger.LogWarning("Game with ID {GameId} not found", id);
-        return (false, "Game not found");
+        return (false, "GameNotFound");
       }
 
       await _unitOfWork.Games.DeleteAsync(game.Id);
       await _unitOfWork.CommitAsync();
 
       _logger.LogInformation("Game with ID {GameId} deleted successfully", id);
-      return (true, "Game deleted successfully");
+      return (true, "GameService.DeleteGameAsync.GameDeletedSuccessfully");
     }
     catch (Exception ex)
     {
       _logger.LogError(ex, "Error deleting game with ID: {GameId}", id);
-      return (false, "An error occurred while deleting the game");
+      return (false, "GameService.DeleteGameAsync.AnErrorOccurredWhileDeletingTheGame");
     }
   }
 
