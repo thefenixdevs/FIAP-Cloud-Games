@@ -45,7 +45,7 @@ public class AuthServiceTests
     var result = await _authService.RegisterAsync(request);
 
     Assert.True(result.Success);
-    Assert.Equal("User registered successfully", result.Message);
+    Assert.Equal("AuthService.RegisterAsync.UserRegisteredSuccessfully", result.Message);
     Assert.NotNull(result.UserId);
     _userRepositoryMock.Verify(x => x.AddAsync(It.IsAny<User>()), Times.Once);
     _unitOfWorkMock.Verify(x => x.CommitAsync(It.IsAny<CancellationToken>()), Times.Once);
@@ -60,7 +60,7 @@ public class AuthServiceTests
     var result = await _authService.RegisterAsync(request);
 
     Assert.False(result.Success);
-    Assert.Equal("Email already exists", result.Message);
+    Assert.Equal("AuthService.RegisterAsync.EmailAlreadyExists", result.Message);
     Assert.Null(result.UserId);
     _userRepositoryMock.Verify(x => x.AddAsync(It.IsAny<User>()), Times.Never);
   }
@@ -75,7 +75,7 @@ public class AuthServiceTests
     var result = await _authService.RegisterAsync(request);
 
     Assert.False(result.Success);
-    Assert.Equal("Username already exists", result.Message);
+    Assert.Equal("AuthService.RegisterAsync.UsernameAlreadyExists", result.Message);
     Assert.Null(result.UserId);
     _userRepositoryMock.Verify(x => x.AddAsync(It.IsAny<User>()), Times.Never);
   }
@@ -108,7 +108,7 @@ public class AuthServiceTests
     var result = await _authService.RegisterAsync(request);
 
     Assert.False(result.Success);
-    Assert.Equal("An error occurred during registration", result.Message);
+    Assert.Equal("AuthService.RegisterAsync.AnErrorOccurredDuringRegistration", result.Message);
     Assert.Null(result.UserId);
   }
 
@@ -122,7 +122,7 @@ public class AuthServiceTests
     var result = await _authService.RegisterAsync(request);
 
     Assert.False(result.Success);
-    Assert.Contains("Password must be at least 8 characters long.", result.Message);
+    Assert.Contains("Auth.Register.PasswordMustBeAtLeast8CharactersLong", result.Message);
     Assert.Null(result.UserId);
     _passwordHasherMock.Verify(x => x.Hash(It.IsAny<string>()), Times.Never);
   }
@@ -142,7 +142,7 @@ public class AuthServiceTests
     var result = await _authService.LoginAsync(request);
 
     Assert.True(result.Success);
-    Assert.Equal("Login successful", result.Message);
+    Assert.Equal("AuthService.LoginAsync.LoginSuccessful", result.Message);
     Assert.NotNull(result.Response);
     Assert.Equal(user.Id, result.Response.UserId);
     Assert.Equal(user.Username, result.Response.Username);
@@ -167,7 +167,7 @@ public class AuthServiceTests
     var result = await _authService.LoginAsync(request);
 
     Assert.True(result.Success);
-    Assert.Equal("Login successful", result.Message);
+    Assert.Equal("AuthService.LoginAsync.LoginSuccessful", result.Message);
     Assert.NotNull(result.Response);
     Assert.Equal(user.Id, result.Response.UserId);
     Assert.Equal(user.Username, result.Response.Username);
@@ -188,7 +188,7 @@ public class AuthServiceTests
     var result = await _authService.LoginAsync(request);
 
     Assert.False(result.Success);
-    Assert.Equal("Invalid credentials", result.Message);
+    Assert.Equal("AuthService.LoginAsync.InvalidCredentials", result.Message);
     Assert.Null(result.Response);
   }
 
@@ -205,7 +205,7 @@ public class AuthServiceTests
     var result = await _authService.LoginAsync(request);
 
     Assert.False(result.Success);
-    Assert.Equal("Invalid credentials", result.Message);
+    Assert.Equal("AuthService.LoginAsync.InvalidCredentials", result.Message);
     Assert.Null(result.Response);
   }
 
@@ -223,7 +223,7 @@ public class AuthServiceTests
     var result = await _authService.LoginAsync(request);
 
     Assert.False(result.Success);
-    Assert.Equal("Account is banned", result.Message);
+    Assert.Equal("AuthService.LoginAsync.AccountIsBanned", result.Message);
     Assert.Null(result.Response);
   }
 
@@ -240,7 +240,7 @@ public class AuthServiceTests
     var result = await _authService.LoginAsync(request);
 
     Assert.False(result.Success);
-    Assert.Equal("Account pending email confirmation", result.Message);
+    Assert.Equal("AuthService.LoginAsync.AccountPendingEmailConfirmation", result.Message);
     Assert.Null(result.Response);
   }
 
@@ -254,7 +254,7 @@ public class AuthServiceTests
     var result = await _authService.LoginAsync(request);
 
     Assert.False(result.Success);
-    Assert.Equal("An error occurred during login", result.Message);
+    Assert.Equal("AuthService.LoginAsync.AnErrorOccurredDuringLogin", result.Message);
     Assert.Null(result.Response);
   }
 
@@ -288,7 +288,7 @@ public class AuthServiceTests
     var result = await _authService.LoginAsync(request);
 
     Assert.False(result.Success);
-    Assert.Equal("Account is blocked", result.Message);
+    Assert.Equal("AuthService.LoginAsync.AccountIsBlocked", result.Message);
     Assert.Null(result.Response);
   }
 
