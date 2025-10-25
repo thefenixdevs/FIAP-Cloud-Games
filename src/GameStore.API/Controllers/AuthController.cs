@@ -40,13 +40,14 @@ public class AuthController : ControllerBase
     }
 
     var (success, message, userId) = await _authService.RegisterAsync(request);
-
+    string translatedMessage = _translator.Translate(message);
+    
     if (!success)
     {
-      return BadRequest(new { message });
+      return BadRequest(new { message = translatedMessage });
     }
 
-    return Ok(new { message, userId });
+    return Ok(new { message = translatedMessage, userId });
   }
 
   [HttpPost("login")]
@@ -60,12 +61,13 @@ public class AuthController : ControllerBase
     }
 
     var (success, message, response) = await _authService.LoginAsync(request);
+    string translatedMessage = _translator.Translate(message);
 
     if (!success || response == null)
     {
-      return Unauthorized(new { message });
+      return Unauthorized(new { message = translatedMessage });
     }
 
-    return Ok(response);
+    return Ok(new { message = translatedMessage });
   }
 }

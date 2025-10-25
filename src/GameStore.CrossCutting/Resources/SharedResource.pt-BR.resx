@@ -157,4 +157,34 @@
   <data name="ExceptionHandlingMiddleware.UnauthenticatedUser" xml:space="preserve">
     <value>Usuário não autenticado</value>
   </data>
+  <data name="AuthService.RegisterAsync.EmailAlreadyExists" xml:space="preserve">
+    <value>Email já utilizado</value>
+  </data>
+  <data name="AuthService.RegisterAsync.UsernameAlreadyExists" xml:space="preserve">
+    <value>Username já utilizado</value>
+  </data>
+  <data name="AuthService.RegisterAsync.UserRegisteredSuccessfully" xml:space="preserve">
+    <value>Usuário registrado com sucesso</value>
+  </data>
+  <data name="AuthService.RegisterAsync.AnErrorOccurredDuringRegistration" xml:space="preserve">
+    <value>Ocorreu um erro durante o registro</value>
+  </data>
+  <data name="AuthService.LoginAsync.InvalidCredentials" xml:space="preserve">
+    <value>Credenciais inválidas</value>
+  </data>
+  <data name="AuthService.LoginAsync.AccountPendingEmailConfirmation" xml:space="preserve">
+    <value>Conta pendente de confirmação de email</value>
+  </data>
+  <data name="AuthService.LoginAsync.AccountIsBlocked" xml:space="preserve">
+    <value>Conta esta bloqueada</value>
+  </data>
+  <data name="AuthService.LoginAsync.AccountIsBanned" xml:space="preserve">
+    <value>Conta esta banida</value>
+  </data>
+  <data name="AuthService.LoginAsync.LoginSuccessful" xml:space="preserve">
+    <value>Login realizado com sucesso</value>
+  </data>
+  <data name="AuthService.LoginAsync.AnErrorOccurredDuringLogin" xml:space="preserve">
+    <value>Um erro ocorreu durante o login</value>
+  </data>
 </root>

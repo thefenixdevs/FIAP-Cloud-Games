@@ -30,13 +30,13 @@ public class AuthService : IAuthService
       if (await _unitOfWork.Users.ExistsByEmailAsync(request.Email))
       {
         _logger.LogWarning("Registration failed: Email {Email} already exists", request.Email);
-        return (false, "Email already exists", null);
+        return (false, "AuthService.RegisterAsync.EmailAlreadyExists", null);
       }
 
       if (await _unitOfWork.Users.ExistsByUsernameAsync(request.Username))
       {
         _logger.LogWarning("Registration failed: Username {Username} already exists", request.Username);
-        return (false, "Username already exists", null);
+        return (false, "AuthService.RegisterAsync.UsernameAlreadyExists", null);
       }
 
       var user = User.Register(request.Name, request.Email, request.Username, request.Password, _passwordHasher);
@@ -45,7 +45,7 @@ public class AuthService : IAuthService
       await _unitOfWork.CommitAsync();
 
       _logger.LogInformation("User {Username} registered successfully with ID {UserId}", user.Username, user.Id);
-      return (true, "User registered successfully", user.Id);
+      return (true, "AuthService.RegisterAsync.UserRegisteredSuccessfully", user.Id);
     }
     catch (ArgumentException ex) when (ex.ParamName == "email")
     {
@@ -60,7 +60,7 @@ public class AuthService : IAuthService
     catch (Exception ex)
     {
       _logger.LogError(ex, "Error during user registration for email {Email}", request.Email);
-      return (false, "An error occurred during registration", null);
+      return (false, "AuthService.RegisterAsync.AnErrorOccurredDuringRegistration", null);
     }
   }
 
@@ -87,26 +87,26 @@ public class AuthService : IAuthService
       if (user == null)
       {
         _logger.LogWarning("Login failed: User with identifier {Identifier} not found", request.Identifier);
-        return (false, "Invalid credentials", null);
+        return (false, "AuthService.LoginAsync.InvalidCredentials", null);
       }
 
       if (!user.VerifyPassword(request.Password, _passwordHasher))
       {
         _logger.LogWarning("Login failed: Invalid password for identifier {Identifier}", request.Identifier);
-        return (false, "Invalid credentials", null);
+        return (false, "AuthService.LoginAsync.InvalidCredentials", null);
       }
 
       switch (user.AccountStatus)
       {
         case AccountStatus.Pending:
           _logger.LogWarning("Login failed: Account pending confirmation for identifier {Identifier}", request.Identifier);
-          return (false, "Account pending email confirmation", null);
+          return (false, "AuthService.LoginAsync.AccountPendingEmailConfirmation", null);
         case AccountStatus.Blocked:
           _logger.LogWarning("Login failed: Account is blocked for identifier {Identifier}", request.Identifier);
-          return (false, "Account is blocked", null);
+          return (false, "AuthService.LoginAsync.AccountIsBlocked", null);
         case AccountStatus.Banned:
           _logger.LogWarning("Login failed: Account is banned for identifier {Identifier}", request.Identifier);
-          return (false, "Account is banned", null);
+          return (false, "AuthService.LoginAsync.AccountIsBanned", null);
       }
 
       var token = _jwtService.GenerateToken(user);
@@ -120,12 +120,12 @@ public class AuthService : IAuthService
         user.AccountStatus);
 
       _logger.LogInformation("User {Username} logged in successfully using {Lookup}", user.Username, lookedUpBy);
-      return (true, "Login successful", response);
+      return (true, "AuthService.LoginAsync.LoginSuccessful", response);
     }
     catch (Exception ex)
     {
       _logger.LogError(ex, "Error during user login for identifier {Identifier}", request.Identifier);
-      return (false, "An error occurred during login", null);
+      return (false, "AuthService.LoginAsync.AnErrorOccurredDuringLogin", null);
     }
   }
 }
