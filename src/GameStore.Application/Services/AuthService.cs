@@ -30,13 +30,13 @@ public class AuthService : IAuthService
       if (await _unitOfWork.Users.ExistsByEmailAsync(request.Email))
       {
         _logger.LogWarning("Registration failed: Email {Email} already exists", request.Email);
-        return (false, "AuthService.RegisterAsync.EmailAlreadyExists", null);
+        return (false, "EmailAlreadyExists", null);
       }
 
       if (await _unitOfWork.Users.ExistsByUsernameAsync(request.Username))
       {
         _logger.LogWarning("Registration failed: Username {Username} already exists", request.Username);
-        return (false, "AuthService.RegisterAsync.UsernameAlreadyExists", null);
+        return (false, "UsernameAlreadyExists", null);
       }
 
       var user = User.Register(request.Name, request.Email, request.Username, request.Password, _passwordHasher);
@@ -45,7 +45,7 @@ public class AuthService : IAuthService
       await _unitOfWork.CommitAsync();
 
       _logger.LogInformation("User {Username} registered successfully with ID {UserId}", user.Username, user.Id);
-      return (true, "AuthService.RegisterAsync.UserRegisteredSuccessfully", user.Id);
+      return (true, "UserRegisteredSuccessfully", user.Id);
     }
     catch (ArgumentException ex) when (ex.ParamName == "email")
     {

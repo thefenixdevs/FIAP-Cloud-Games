@@ -37,7 +37,7 @@ public class UsersController : ControllerBase
 
         if (user == null)
         {
-            return NotFound(new { message = _translator.Translate("Users.GetById.UserNotFound") });
+            return NotFound(new { message = _translator.Translate("UserNotFound") });
         }
 
         return Ok(user);
@@ -63,13 +63,14 @@ public class UsersController : ControllerBase
         }
 
         var (success, message, user) = await _userService.CreateUserAsync(request);
+        string translatedMessage = _translator.Translate(message);
 
         if (!success || user == null)
         {
-            return BadRequest(new { message });
+            return BadRequest(new { message = translatedMessage });
         }
 
-        return Ok(new { message, user.Id });
+        return Ok(new { message = translatedMessage, user.Id });
     }
 
     [HttpPut("{id}")]
@@ -92,13 +93,14 @@ public class UsersController : ControllerBase
         }
 
         var (success, message) = await _userService.UpdateUserAsync(id, request);
+        string translatedMessage = _translator.Translate(message);
 
         if (!success)
         {
-            return NotFound(new { message });
+            return NotFound(new { message = translatedMessage });
         }
 
-        return Ok(message);
+        return Ok(new { message = translatedMessage });
     }
 
     [HttpDelete("{id}")]
@@ -106,12 +108,13 @@ public class UsersController : ControllerBase
     public async Task<IActionResult> DeleteUser(Guid id)
     {
         var (success, message) = await _userService.DeleteUserAsync(id);
+        string translatedMessage = _translator.Translate(message);
 
         if (!success)
         {
-            return NotFound(new { message });
+            return NotFound(new { message = translatedMessage });
         }
 
-        return Ok(message);
+        return Ok(new { message = translatedMessage });
     }
 }

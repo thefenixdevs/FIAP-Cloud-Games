@@ -127,7 +127,7 @@
   <data name="Auth.Login.IdentifierAndPasswordAreRequired" xml:space="preserve">
     <value>Identifier and password are required</value>
   </data>
-  <data name="Games.GetById.GameNotFound" xml:space="preserve">
+  <data name="GameNotFound" xml:space="preserve">
     <value>Game not found</value>
   </data>
   <data name="Games.CreateUpdateGame.TitleIsRequired" xml:space="preserve">
@@ -136,7 +136,7 @@
   <data name="Game.CreateUpdateGame.PriceCannotBeNegative" xml:space="preserve">
     <value>Price cannot be negative</value>
   </data>
-  <data name="Users.GetById.UserNotFound" xml:space="preserve">
+  <data name="UserNotFound" xml:space="preserve">
     <value>User not found</value>
   </data>
   <data name="Users.CreateUpdateUser.NameIsRequired" xml:space="preserve">
@@ -157,13 +157,13 @@
   <data name="ExceptionHandlingMiddleware.UnauthenticatedUser" xml:space="preserve">
     <value>Unauthenticated user</value>
   </data>
-  <data name="AuthService.RegisterAsync.EmailAlreadyExists" xml:space="preserve">
+  <data name="EmailAlreadyExists" xml:space="preserve">
     <value>Email already exists</value>
   </data>
-  <data name="AuthService.RegisterAsync.UsernameAlreadyExists" xml:space="preserve">
+  <data name="UsernameAlreadyExists" xml:space="preserve">
     <value>Username already exists</value>
   </data>
-  <data name="AuthService.RegisterAsync.UserRegisteredSuccessfully" xml:space="preserve">
+  <data name="UserRegisteredSuccessfully" xml:space="preserve">
     <value>User registered successfully</value>
   </data>
   <data name="AuthService.RegisterAsync.AnErrorOccurredDuringRegistration" xml:space="preserve">
@@ -186,5 +186,38 @@
   </data>
   <data name="AuthService.LoginAsync.AnErrorOccurredDuringLogin" xml:space="preserve">
     <value>An error occurred during login</value>
+  </data>
+  <data name="GameService.CreateGameAsync.GameCreatedSuccessfully" xml:space="preserve">
+    <value>Game created successfully</value>
+  </data>
+  <data name="GameService.CreateGameAsync.AnErrorOccurredWhileCreatingTheGame" xml:space="preserve">
+    <value>An error occurred while creating the game</value>
+  </data>
+  <data name="GameUpdatedSuccessfully" xml:space="preserve">
+    <value>Game updated successfully</value>
+  </data>
+  <data name="GameService.UpdateGameAsync.AnErrorOccurredWhileUpdatingTheGame" xml:space="preserve">
+    <value>An error occurred while updating the game</value>
+  </data>
+  <data name="GameService.DeleteGameAsync.GameDeletedSuccessfully" xml:space="preserve">
+    <value>Game deleted successfully</value>
+  </data>
+  <data name="GameService.DeleteGameAsync.AnErrorOccurredWhileDeletingTheGame" xml:space="preserve">
+    <value>An Error occurred while deleting the game</value>
+  </data>
+  <data name="UserService.CreateUserAsync.AnErrorOccurredWhileCreatingTheUser" xml:space="preserve">
+    <value>An error occurred while creating the user</value>
+  </data>
+  <data name="UserUpdatedSuccessfully" xml:space="preserve">
+    <value>User updated successfully</value>
+  </data>
+  <data name="UserService.UpdateUserAsync.AnErrorOccurredWhileUpdatingTheUser" xml:space="preserve">
+    <value>An error occurred while updating the user</value>
+  </data>
+  <data name="UserDeletedSuccessfully" xml:space="preserve">
+    <value>User deleted successfully</value>
+  </data>
+  <data name="UserService.DeleteUserAsync.AnErrorOccurredWhileDeletingTheUser" xml:space="preserve">
+    <value>An error occurred while deleting the user</value>
   </data>
 </root>

@@ -37,7 +37,7 @@ public class GamesController : ControllerBase
 
         if (game == null)
         {
-            return NotFound(new { message = _translator.Translate("Games.GetById.GameNotFound") });
+            return NotFound(new { message = _translator.Translate("GameNotFound") });
         }
 
         return Ok(game);
@@ -58,10 +58,11 @@ public class GamesController : ControllerBase
         }
 
         var (success, message, game) = await _gameService.CreateGameAsync(request);
+        string translatedMessage = _translator.Translate(message);
 
         if (!success || game == null)
         {
-            return BadRequest(new { message });
+            return BadRequest(new { message = translatedMessage });
         }
 
         return CreatedAtAction(nameof(GetGame), new { id = game.Id }, game);
@@ -82,10 +83,11 @@ public class GamesController : ControllerBase
         }
 
         var (success, message) = await _gameService.UpdateGameAsync(id, request);
+        string translatedMessage = _translator.Translate(message);
 
         if (!success)
         {
-            return NotFound(new { message });
+            return NotFound(new { message = translatedMessage });
         }
 
         return NoContent();
@@ -96,10 +98,11 @@ public class GamesController : ControllerBase
     public async Task<IActionResult> DeleteGame(Guid id)
     {
         var (success, message) = await _gameService.DeleteGameAsync(id);
+        string translatedMessage = _translator.Translate(message);
 
         if (!success)
         {
-            return NotFound(new { message });
+            return NotFound(new { message = translatedMessage });
         }
 
         return NoContent();

@@ -45,7 +45,7 @@ public class AuthServiceTests
     var result = await _authService.RegisterAsync(request);
 
     Assert.True(result.Success);
-    Assert.Equal("AuthService.RegisterAsync.UserRegisteredSuccessfully", result.Message);
+    Assert.Equal("UserRegisteredSuccessfully", result.Message);
     Assert.NotNull(result.UserId);
     _userRepositoryMock.Verify(x => x.AddAsync(It.IsAny<User>()), Times.Once);
     _unitOfWorkMock.Verify(x => x.CommitAsync(It.IsAny<CancellationToken>()), Times.Once);
@@ -60,7 +60,7 @@ public class AuthServiceTests
     var result = await _authService.RegisterAsync(request);
 
     Assert.False(result.Success);
-    Assert.Equal("AuthService.RegisterAsync.EmailAlreadyExists", result.Message);
+    Assert.Equal("EmailAlreadyExists", result.Message);
     Assert.Null(result.UserId);
     _userRepositoryMock.Verify(x => x.AddAsync(It.IsAny<User>()), Times.Never);
   }
@@ -75,7 +75,7 @@ public class AuthServiceTests
     var result = await _authService.RegisterAsync(request);
 
     Assert.False(result.Success);
-    Assert.Equal("AuthService.RegisterAsync.UsernameAlreadyExists", result.Message);
+    Assert.Equal("UsernameAlreadyExists", result.Message);
     Assert.Null(result.UserId);
     _userRepositoryMock.Verify(x => x.AddAsync(It.IsAny<User>()), Times.Never);
   }
@@ -122,7 +122,7 @@ public class AuthServiceTests
     var result = await _authService.RegisterAsync(request);
 
     Assert.False(result.Success);
-    Assert.Contains("Auth.Register.PasswordMustBeAtLeast8CharactersLong", result.Message);
+    Assert.Contains("Password must be at least 8 characters long. (Parameter 'password')", result.Message);
     Assert.Null(result.UserId);
     _passwordHasherMock.Verify(x => x.Hash(It.IsAny<string>()), Times.Never);
   }
