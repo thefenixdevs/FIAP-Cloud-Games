@@ -149,13 +149,13 @@ public class AuthService : IAuthService
     User? user = null;
 
     if (request is null || string.IsNullOrWhiteSpace(request.Email))
-      return (false, "E-mail is required", null);
+      return (false, "Users.CreateUpdateUser.EmailIsRequired", null);
 
     try
     {
       user = await _unitOfWork.Users.GetByEmailAsync(request.Email);
       if (user == null)
-        return (false, "User not found", null);
+        return (false, "UserNotFound", null);
 
       var masked = _encriptService.EncodeMaskedCode(request.Email);
       var confirmationLink = $"https://localhost:7055/api/Auth/ValidationAccount?code={masked}";
@@ -168,12 +168,12 @@ public class AuthService : IAuthService
       );
 
       _logger.LogInformation("Confirmation email sent to {Email}", user.Email);
-      return (true, "Confirmation email sent successfully", null);
+      return (true, "AuthService.SendAccountConfirmationAsync.ConfirmationEmailSentSuccessfully", null);
     }
     catch (Exception ex)
     {
       _logger.LogError(ex, "Error while sending confirmation e-mail for {Email}", request.Email);
-      return (false, "Failed to send confirmation e-mail", null);
+      return (false, "AuthService.SendAccountConfirmationAsync.FailedToSendConfirmationEmail", null);
     }
   }
 
@@ -182,19 +182,19 @@ public class AuthService : IAuthService
     User? user = null;
 
     if (request is null || string.IsNullOrWhiteSpace(request.Email))
-      return (false, "E-mail is required", null);
+      return (false, "EmailIsRequired", null);
 
     try
     {
       user = await _unitOfWork.Users.GetByEmailAsync(request.Email);
       if (user == null)
-        return (false, "User not found", null);
+        return (false, "UserNotFound", null);
 
       if (user.AccountStatus == AccountStatus.Active)
-        return (false, "Account already confirmed", null);
+        return (false, "AccountAlreadyConfirmed", null);
 
       if (DateTime.Now > request.Expiration.AddMinutes(15))
-        return (false, "Activation link expired", null);
+        return (false, "ActivationLinkExpired", null);
 
       user = User.Update(user, user.Name, user.Email, user.Username, AccountStatus.Active, user.ProfileType);
 
@@ -202,12 +202,12 @@ public class AuthService : IAuthService
       await _unitOfWork.CommitAsync();
 
       _logger.LogInformation("Account {Email} successfully confirmed", user.Email);
-      return (true, "Account confirmed successfully", null);
+      return (true, "AccountConfirmedSuccessfully", null);
     }
     catch (Exception ex)
     {
       _logger.LogError(ex, "Error during account validation for {Email}", request.Email);
-      return (false, "An error occurred during account validation", null);
+      return (false, "AnErrorOccurredDuringAccountValidation", null);
     }
   }
 }

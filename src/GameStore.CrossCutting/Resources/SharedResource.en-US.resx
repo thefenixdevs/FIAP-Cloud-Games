@@ -148,7 +148,7 @@
   <data name="Users.CreateUpdateUser.UsernameIsRequired" xml:space="preserve">
     <value>Username is required</value>
   </data>
-  <data name="Users.CreateUpdateUser.EmailIsRequired" xml:space="preserve">
+  <data name="EmailIsRequired" xml:space="preserve">
     <value>Email is required</value>
   </data>
   <data name="ExceptionHandlingMiddleware.UnauthorizedUser" xml:space="preserve">
@@ -219,5 +219,26 @@
   </data>
   <data name="UserService.DeleteUserAsync.AnErrorOccurredWhileDeletingTheUser" xml:space="preserve">
     <value>An error occurred while deleting the user</value>
+  </data>
+  <data name="AuthService.SendAccountConfirmationAsync.ConfirmationEmailSentSuccessfully" xml:space="preserve">
+    <value>Confirmation email sent successfully</value>
+  </data>
+  <data name="AuthService.SendAccountConfirmationAsync.FailedToSendConfirmationEmail" xml:space="preserve">
+    <value>Failed to send confirmation e-mail</value>
+  </data>
+  <data name="AuthService.ValidationAccount.InvalidCode" xml:space="preserve">
+    <value>Invalid code</value>
+  </data>
+  <data name="AccountAlreadyConfirmed" xml:space="preserve">
+    <value>Account already confirmed</value>
+  </data>
+  <data name="ActivationLinkExpired" xml:space="preserve">
+    <value>Activation link expired</value>
+  </data>
+  <data name="AccountConfirmedSuccessfully" xml:space="preserve">
+    <value>Account confirmed successfully</value>
+  </data>
+  <data name="AnErrorOccurredDuringAccountValidation" xml:space="preserve">
+    <value>An error occurred during account validation</value>
   </data>
 </root>
