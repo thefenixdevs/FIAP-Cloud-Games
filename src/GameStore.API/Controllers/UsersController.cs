@@ -54,7 +54,7 @@ public class UsersController : ControllerBase
 
         if (string.IsNullOrWhiteSpace(request.Email))
         {
-            return BadRequest(new { message = _translator.Translate("Users.CreateUpdateUser.EmailIsRequired") });
+            return BadRequest(new { message = _translator.Translate("EmailIsRequired") });
         }
 
         if (string.IsNullOrWhiteSpace(request.Username))
@@ -84,7 +84,7 @@ public class UsersController : ControllerBase
 
         if (string.IsNullOrWhiteSpace(request.Email))
         {
-            return BadRequest(new { message = _translator.Translate("Users.CreateUpdateUser.EmailIsRequired") });
+            return BadRequest(new { message = _translator.Translate("EmailIsRequired") });
         }
 
         if (string.IsNullOrWhiteSpace(request.Username))

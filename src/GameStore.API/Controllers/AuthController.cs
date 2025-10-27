@@ -79,13 +79,16 @@ public class AuthController : ControllerBase
     _logger.LogInformation("Confirmation send for email: {Email}", request.Email);
 
     if (string.IsNullOrWhiteSpace(request.Email))
-        return BadRequest(new { message = "E-mail are required" });
+        return BadRequest(new { message = _translator.Translate("EmailIsRequired") });
 
     var (success, message, response) = await _authService.SendAccountConfirmationAsync(request);
-    if (!success)
-        return BadRequest(new { message });
 
-    return Ok(new { message });
+    string translatedMessage = _translator.Translate(message);
+
+    if (!success)
+        return BadRequest(new { message = translatedMessage });
+
+    return Ok(new { message = translatedMessage });
   }
 
   [HttpGet("validationAccount")]
@@ -95,20 +98,22 @@ public class AuthController : ControllerBase
 
     var decoded = _encriptService.DecodeMaskedCode(Code);
     if (decoded == null)
-        return BadRequest(new { message = "Invalid code" });
+        return BadRequest(new { message = _translator.Translate("AuthService.ValidationAccount.InvalidCode") });
 
-    _logger.LogInformation("Email validation attempt for: {Email}", decoded.Value.Email);
+        _logger.LogInformation("Email validation attempt for: {Email}", decoded.Value.Email);
 
     var request = new ValidationAccountRequest(decoded.Value.Email, DateTime.Parse(decoded.Value.Expiration));
 
     if (string.IsNullOrWhiteSpace(request.Email))
-        return BadRequest(new { message = "E-mail are required" });
+        return BadRequest(new { message = _translator.Translate("EmailIsRequired") });
 
     var (success, message, response) = await _authService.ValidationAccountAsync(request);
 
-    if (!success)
-        return BadRequest(new { message });
+    string translatedMessage = _translator.Translate(message);
 
-    return Ok(new { message });
+    if (!success)
+        return BadRequest(new { message = translatedMessage });
+
+    return Ok(new { message = translatedMessage });
   }
 }
