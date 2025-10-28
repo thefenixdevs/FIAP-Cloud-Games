@@ -132,7 +132,7 @@ public class AuthServiceTests
     var result = await _authService.RegisterAsync(request);
 
     Assert.False(result.Success);
-    Assert.Contains("Password must be at least 8 characters long. (Parameter 'password')", result.Message);
+    Assert.Contains("A senha deve ter no mínimo 8 caracteres. (Parameter 'password')", result.Message);
     Assert.Null(result.UserId);
     _passwordHasherMock.Verify(x => x.Hash(It.IsAny<string>()), Times.Never);
   }
