@@ -69,7 +69,7 @@ public class GamesController : ControllerBase
     }
 
     [HttpPut("{id}")]
-    [Authorize]
+    [Authorize(Policy = "ConfirmedAdmin")]
     public async Task<IActionResult> UpdateGame(Guid id, [FromBody] UpdateGameRequest request)
     {
         if (string.IsNullOrWhiteSpace(request.Title))
@@ -94,7 +94,7 @@ public class GamesController : ControllerBase
     }
 
     [HttpDelete("{id}")]
-    [Authorize]
+    [Authorize(Policy = "ConfirmedAdmin")]
     public async Task<IActionResult> DeleteGame(Guid id)
     {
         var (success, message) = await _gameService.DeleteGameAsync(id);

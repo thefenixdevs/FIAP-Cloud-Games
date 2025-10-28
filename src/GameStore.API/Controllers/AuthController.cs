@@ -70,7 +70,7 @@ public class AuthController : ControllerBase
       return Unauthorized(new { message = translatedMessage });
     }
 
-    return Ok(new { message });
+    return Ok(new { response, success });
   }
 
   [HttpPost("sendConfirmation")]
