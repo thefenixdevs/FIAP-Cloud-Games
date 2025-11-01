@@ -133,6 +133,9 @@
   <data name="Games.CreateUpdateGame.TitleIsRequired" xml:space="preserve">
     <value>O Campo 'Title' é obrigatório</value>
   </data>
+  <data name="Games.CreateUpdateGame.TitleAlreadyExists" xml:space="preserve">
+    <value>Já existe um jogo com este título</value>
+  </data>
   <data name="Game.CreateUpdateGame.PriceCannotBeNegative" xml:space="preserve">
     <value>O Campo 'Price' não pode ser negativo</value>
   </data>
@@ -148,8 +151,50 @@
   <data name="Users.CreateUpdateUser.UsernameIsRequired" xml:space="preserve">
     <value>O Campo 'Username' é obrigatório</value>
   </data>
+  <data name="Users.CreateUpdateUser.NameMaxLengthExceeded" xml:space="preserve">
+    <value>O nome não pode exceder 200 caracteres</value>
+  </data>
+  <data name="Users.CreateUpdateUser.UsernameMinLength" xml:space="preserve">
+    <value>O username deve ter no mínimo 3 caracteres</value>
+  </data>
+  <data name="Users.CreateUpdateUser.UsernameMaxLengthExceeded" xml:space="preserve">
+    <value>O username não pode exceder 50 caracteres</value>
+  </data>
+  <data name="Users.CreateUpdateUser.UsernameInvalidFormat" xml:space="preserve">
+    <value>O username deve conter apenas letras, números e underscore</value>
+  </data>
+  <data name="Users.CreateUpdateUser.PasswordIsRequired" xml:space="preserve">
+    <value>O Campo 'Password' é obrigatório</value>
+  </data>
+  <data name="Users.CreateUpdateUser.PasswordMustBeAtLeast8CharactersLong" xml:space="preserve">
+    <value>A Senha deve ter ao menos 8 caracteres</value>
+  </data>
+  <data name="Users.CreateUpdateUser.PasswordMaxLengthExceeded" xml:space="preserve">
+    <value>A senha não pode exceder 100 caracteres</value>
+  </data>
+  <data name="Users.CreateUpdateUser.PasswordMustContainUpperCase" xml:space="preserve">
+    <value>A senha deve conter pelo menos uma letra maiúscula</value>
+  </data>
+  <data name="Users.CreateUpdateUser.PasswordMustContainLowerCase" xml:space="preserve">
+    <value>A senha deve conter pelo menos uma letra minúscula</value>
+  </data>
+  <data name="Users.CreateUpdateUser.PasswordMustContainNumber" xml:space="preserve">
+    <value>A senha deve conter pelo menos um número</value>
+  </data>
+  <data name="Users.CreateUpdateUser.PasswordMustContainSpecialCharacter" xml:space="preserve">
+    <value>A senha deve conter pelo menos um caractere especial</value>
+  </data>
+  <data name="Users.Update.IdIsRequired" xml:space="preserve">
+    <value>O ID do usuário é obrigatório</value>
+  </data>
   <data name="EmailIsRequired" xml:space="preserve">
     <value>O Campo 'Email' é obrigatório</value>
+  </data>
+  <data name="EmailInvalidFormat" xml:space="preserve">
+    <value>O formato do email é inválido</value>
+  </data>
+  <data name="EmailMaxLengthExceeded" xml:space="preserve">
+    <value>O email não pode exceder 320 caracteres</value>
   </data>
   <data name="ExceptionHandlingMiddleware.UnauthorizedUser" xml:space="preserve">
     <value>Usuário não autorizado</value>
@@ -240,5 +285,56 @@
   </data>
   <data name="AnErrorOccurredDuringAccountValidation" xml:space="preserve">
     <value>Um erro ocorreu durante a validação da conta</value>
+  </data>
+  <data name="Auth.Register.EmailIsRequired" xml:space="preserve">
+    <value>O Campo 'Email' é obrigatório</value>
+  </data>
+  <data name="Auth.Register.EmailInvalidFormat" xml:space="preserve">
+    <value>O formato do email é inválido</value>
+  </data>
+  <data name="Auth.Register.EmailMaxLengthExceeded" xml:space="preserve">
+    <value>O email não pode exceder 320 caracteres</value>
+  </data>
+  <data name="Auth.Register.NameIsRequired" xml:space="preserve">
+    <value>O Campo 'Name' é obrigatório</value>
+  </data>
+  <data name="Auth.Register.NameMaxLengthExceeded" xml:space="preserve">
+    <value>O nome não pode exceder 200 caracteres</value>
+  </data>
+  <data name="Auth.Register.UsernameIsRequired" xml:space="preserve">
+    <value>O Campo 'Username' é obrigatório</value>
+  </data>
+  <data name="Auth.Register.UsernameMinLength" xml:space="preserve">
+    <value>O username deve ter no mínimo 3 caracteres</value>
+  </data>
+  <data name="Auth.Register.UsernameMaxLengthExceeded" xml:space="preserve">
+    <value>O username não pode exceder 50 caracteres</value>
+  </data>
+  <data name="Auth.Register.UsernameInvalidFormat" xml:space="preserve">
+    <value>O username deve conter apenas letras, números e underscore</value>
+  </data>
+  <data name="Auth.Register.PasswordIsRequired" xml:space="preserve">
+    <value>O Campo 'Password' é obrigatório</value>
+  </data>
+  <data name="Auth.Register.PasswordMaxLengthExceeded" xml:space="preserve">
+    <value>A senha não pode exceder 100 caracteres</value>
+  </data>
+  <data name="Auth.Register.PasswordInvalidFormat" xml:space="preserve">
+    <value>A senha não atende aos requisitos de segurança</value>
+  </data>
+  <data name="Auth.Register.PasswordMustContainUpperCase" xml:space="preserve">
+    <value>A senha deve conter pelo menos uma letra maiúscula</value>
+  </data>
+  <data name="Auth.Register.PasswordMustContainLowerCase" xml:space="preserve">
+    <value>A senha deve conter pelo menos uma letra minúscula</value>
+  </data>
+  <data name="Auth.Register.PasswordMustContainNumber" xml:space="preserve">
+    <value>A senha deve conter pelo menos um número</value>
+  </data>
+  <data name="Auth.Register.PasswordMustContainSpecialCharacter" xml:space="preserve">
+    <value>A senha deve conter pelo menos um caractere especial</value>
+  </data>
+  <data name="ValidationFailed" xml:space="preserve">
+    <value>Falha na validação</value>
   </data>
 </root>

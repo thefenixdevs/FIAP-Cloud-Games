@@ -8,5 +8,15 @@ namespace GameStore.Domain.Repositories;
 /// </summary>
 public interface IGameRepository : IRepository<Game>
 {
-  // Place for future Game-specific queries
+  /// <summary>
+  /// Verifica se existe um jogo com o título especificado (case-insensitive).
+  /// </summary>
+  /// <param name="title">Título do jogo a ser verificado</param>
+  Task<bool> ExistsByTitleAsync(string title);
+
+  /// <summary>
+  /// Obtém um jogo pelo título especificado (case-insensitive).
+  /// </summary>
+  /// <param name="title">Título do jogo</param>
+  Task<Game?> GetByTitleAsync(string title);
 }

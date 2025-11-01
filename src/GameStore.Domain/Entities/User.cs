@@ -1,3 +1,4 @@
+using GameStore.Domain.Common;
 using GameStore.Domain.Enums;
 using GameStore.Domain.Security;
 using GameStore.Domain.ValueObjects;
@@ -45,6 +46,72 @@ public class User : BaseEntity
     var user = new User(Email.Create(email), username, name, profileType);
     user.SetPassword(password, passwordHasher);
         return user;
+    }
+
+    /// <summary>
+    /// Tenta criar um User acumulando violações ao invés de lançar exceções.
+    /// Retorna tupla (User?, ValidationErrors) onde ValidationErrors contém todas as violações encontradas.
+    /// </summary>
+    public static (User?, ValidationErrors) TryRegister(string name, string email, string username, string password, IPasswordHasher passwordHasher, ProfileType profileType = ProfileType.CommonUser)
+    {
+        ArgumentNullException.ThrowIfNull(passwordHasher);
+
+        var errors = ValidationErrors.Empty;
+
+        // Validar Name
+        if (string.IsNullOrWhiteSpace(name))
+        {
+            errors = errors.AddError("Name", "Auth.Register.NameIsRequired");
+        }
+        else if (name.Trim().Length > 200)
+        {
+            errors = errors.AddError("Name", "Auth.Register.NameMaxLengthExceeded");
+        }
+
+        // Validar Email usando TryCreate
+        var (emailVo, emailErrors) = Email.TryCreate(email);
+        errors = errors.Merge(emailErrors);
+
+        // Validar Username
+        if (string.IsNullOrWhiteSpace(username))
+        {
+            errors = errors.AddError("Username", "Auth.Register.UsernameIsRequired");
+        }
+        else
+        {
+            var normalizedUsername = UsernameNormalizer.Normalize(username);
+            if (normalizedUsername.Length < 3)
+            {
+                errors = errors.AddError("Username", "Auth.Register.UsernameMinLength");
+            }
+            else if (normalizedUsername.Length > 50)
+            {
+                errors = errors.AddError("Username", "Auth.Register.UsernameMaxLengthExceeded");
+            }
+            else if (!System.Text.RegularExpressions.Regex.IsMatch(normalizedUsername, "^[a-zA-Z0-9_]+$"))
+            {
+                errors = errors.AddError("Username", "Auth.Register.UsernameInvalidFormat");
+            }
+        }
+
+        // Validar Password usando TryCreate
+        var (passwordVo, passwordErrors) = Password.TryCreate(password, passwordHasher);
+        errors = errors.Merge(passwordErrors);
+
+        // Se houver violações, retornar sem criar o User
+        if (!errors.IsValid)
+        {
+            return (null, errors);
+        }
+
+        // Criar o User se todas as validações passaram
+        var user = new User(emailVo!.Value, UsernameNormalizer.Normalize(username), name!.Trim(), profileType);
+        user.Password = passwordVo!.Value;
+        user.Id = Guid.NewGuid();
+        user.CreatedAt = DateTime.UtcNow;
+        user.UpdatedAt = user.CreatedAt;
+
+        return (user, ValidationErrors.Empty);
     }
 
     public static User Update(User user, string name, string email, string username, AccountStatus AccountStatus, ProfileType profileType = ProfileType.CommonUser)

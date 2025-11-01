@@ -1,8 +1,8 @@
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
-using GameStore.Application.Services;
 using GameStore.Domain.Entities;
 using GameStore.Domain.Enums;
+using GameStore.Infrastructure.Services.Authentication;
 using GameStore.Tests.TestUtils;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;

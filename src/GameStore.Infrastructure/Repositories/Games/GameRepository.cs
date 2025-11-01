@@ -2,6 +2,7 @@ using GameStore.Domain.Entities;
 using GameStore.Domain.Repositories;
 using GameStore.Infrastructure.Data;
 using GameStore.Infrastructure.Repositories.Abstractions;
+using Microsoft.EntityFrameworkCore;
 
 namespace GameStore.Infrastructure.Repositories.Games;
 
@@ -11,12 +12,17 @@ namespace GameStore.Infrastructure.Repositories.Games;
 /// </summary>
 public class GameRepository(GameStoreContext context) : EFRepository<Game>(context), IGameRepository
 {
-  // Implementações específicas para Game podem ser adicionadas aqui
-  // Exemplo:
-  // public async Task<IEnumerable<Game>> GetByGenreAsync(string genre)
-  // {
-  //     return await _context.Games
-  //         .Where(g => g.Genre == genre)
-  //         .ToListAsync();
-  // }
+  public async Task<bool> ExistsByTitleAsync(string title)
+  {
+    var normalizedTitle = title?.Trim().ToLowerInvariant() ?? string.Empty;
+    return await _context.Games
+      .AnyAsync(g => g.Title.ToLower() == normalizedTitle);
+  }
+
+  public async Task<Game?> GetByTitleAsync(string title)
+  {
+    var normalizedTitle = title?.Trim().ToLowerInvariant() ?? string.Empty;
+    return await _context.Games
+      .FirstOrDefaultAsync(g => g.Title.ToLower() == normalizedTitle);
+  }
 }

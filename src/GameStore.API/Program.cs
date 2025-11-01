@@ -1,3 +1,4 @@
+using System.Text.Json.Serialization;
 using GameStore.API.Authorization;
 using GameStore.API.Middleware;
 using GameStore.CrossCutting.DependencyInjection;
@@ -12,7 +13,11 @@ var builder = WebApplication.CreateBuilder(args);
 // Configuração do Serilog
 builder.AddSerilogLogging();
 
-builder.Services.AddControllers();
+builder.Services.AddControllers()
+    .AddJsonOptions(options =>
+    {   // Converte enum para string
+        options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+    });
 
 // Configuração do Swagger
 builder.Services.AddApiSwagger();

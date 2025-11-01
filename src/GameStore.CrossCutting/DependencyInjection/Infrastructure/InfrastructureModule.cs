@@ -10,6 +10,9 @@ using GameStore.Infrastructure.Repositories.Abstractions;
 using GameStore.Infrastructure.Repositories.Games;
 using GameStore.Infrastructure.Repositories.Users;
 using GameStore.Infrastructure.Security;
+using GameStore.Infrastructure.Services.Authentication;
+using GameStore.Infrastructure.Services.Email;
+using GameStore.Infrastructure.Services.Encryption;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -31,6 +34,9 @@ public static class InfrastructureModule
     services.AddScoped<IDataSeeder, UserSeeder>();
     services.AddScoped<DataSeederOrchestrator>();
     services.AddScoped<IPasswordHasher, BCryptPasswordHasher>();
+    
+    // Serviços de infraestrutura
+    services.AddScoped<IJwtService, JwtService>();
     services.AddScoped<IEmailService, EmailService>();
     services.AddScoped<IEncriptService, EncriptService>();
 

@@ -19,27 +19,43 @@ public class UserRepository : EFRepository<User>, IUserRepository
 
   public async Task<User?> GetByEmailAsync(string email)
   {
-    var normalizedEmail = Email.Create(email);
-    return await _context.Users.FirstOrDefaultAsync(u => u.Email == normalizedEmail);
+    // Normalizar email (mesma lógica do Email.Create mas sem validação)
+    var (emailVo, emailErrors) = Email.TryCreate(email);
+    if (!emailErrors.IsValid)
+    {
+      return null;
+    }
+    
+    // Email é armazenado como string normalizada no banco (através do HasConversion)
+    // Como Email.Create já normaliza para lowercase, comparar diretamente usando EF.Functions
+    return await _context.Users
+      .FirstOrDefaultAsync(u => u.Email == emailVo);
   }
 
   public async Task<User?> GetByUsernameAsync(string username)
   {
     var normalizedUsername = UsernameNormalizer.NormalizeForComparison(username);
     return await _context.Users.FirstOrDefaultAsync(
-      u => u.Username.ToLower() == normalizedUsername);
+      u => u.Username == normalizedUsername);
   }
 
   public async Task<bool> ExistsByEmailAsync(string email)
   {
-    var normalizedEmail = Email.Create(email);
-    return await _context.Users.AnyAsync(u => u.Email == normalizedEmail);
+    // Normalizar email (mesma lógica do Email.Create mas sem validação)
+    var (emailVo, emailErrors) = Email.TryCreate(email);
+    if (!emailErrors.IsValid)
+    {
+      return false;
+    }
+    // Usar LINQ diretamente já que Email é armazenado como string no banco
+    return await _context.Users
+      .AnyAsync(u => u.Email == emailVo);
   }
 
   public async Task<bool> ExistsByUsernameAsync(string username)
   {
     var normalizedUsername = UsernameNormalizer.NormalizeForComparison(username);
     return await _context.Users.AnyAsync(
-      u => u.Username.ToLower() == normalizedUsername);
+      u => u.Username == normalizedUsername);
   }
 }

@@ -1,3 +1,4 @@
+using GameStore.Application.Common.Exceptions;
 using GameStore.CrossCutting.Localization;
 using System.Net;
 using System.Security;
@@ -27,7 +28,7 @@ namespace GameStore.API.Middleware
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Unhandled error: {Message}", ex.Message);
-                await HandleExceptionAsync(context, ex);
+                await HandleExceptionAsync(context, ex, _translator);
             }
 
             // Captura falhas de autenticação/autorização que não lançam exceção
@@ -41,12 +42,13 @@ namespace GameStore.API.Middleware
             }
         }
 
-        private static async Task HandleExceptionAsync(HttpContext context, Exception ex)
+        private async Task HandleExceptionAsync(HttpContext context, Exception ex, ITranslationService translator)
         {
             context.Response.ContentType = "application/json";
 
             var statusCode = ex switch
             {
+                ApplicationValidationException => HttpStatusCode.BadRequest,
                 UnauthorizedAccessException => HttpStatusCode.Unauthorized,
                 SecurityException => HttpStatusCode.Forbidden,
                 _ => HttpStatusCode.InternalServerError
@@ -54,12 +56,46 @@ namespace GameStore.API.Middleware
 
             context.Response.StatusCode = (int)statusCode;
 
-            var response = new
+            // Tratamento especial para ApplicationValidationException
+            if (ex is ApplicationValidationException validationException)
+            {
+                var translatedMessage = translator.Translate(validationException.Message);
+                
+                // Formatar erros por campo traduzindo as mensagens (consistente com BaseController)
+                var errors = validationException.Errors.ToDictionary(
+                    kvp => kvp.Key,
+                    kvp => kvp.Value.Select(e => translator.Translate(e)).ToArray()
+                );
+
+                // Incluir campo errors apenas se houver erros
+                object response;
+                if (errors.Count > 0)
+                {
+                    response = new
+                    {
+                        message = translatedMessage,
+                        errors = errors
+                    };
+                }
+                else
+                {
+                    response = new
+                    {
+                        message = translatedMessage
+                    };
+                }
+
+                await context.Response.WriteAsync(JsonSerializer.Serialize(response));
+                return;
+            }
+
+            // Para outras exceções, retornar mensagem padrão
+            var defaultResponse = new
             {
                 message = ex.Message,
             };
 
-            await context.Response.WriteAsync(JsonSerializer.Serialize(response));
+            await context.Response.WriteAsync(JsonSerializer.Serialize(defaultResponse));
         }
 
         private static async Task WriteJsonResponse(HttpContext context, HttpStatusCode statusCode, string message)

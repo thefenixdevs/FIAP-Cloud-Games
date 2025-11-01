@@ -1,119 +1,128 @@
-using GameStore.Application.DTOs;
-using GameStore.Application.Services;
-using GameStore.CrossCutting.Localization;
+using GameStore.API.Models.Responses;
+using GameStore.Application.Features.Auth.UseCases.Login;
+using GameStore.Application.Features.Auth.UseCases.RegisterUser;
+using GameStore.Application.Features.Auth.UseCases.SendAccountConfirmation;
+using GameStore.Application.Features.Auth.UseCases.ValidationAccount;
+using GameStore.CrossCutting;
+using Mediator;
 using Microsoft.AspNetCore.Mvc;
-
+using Microsoft.Extensions.Localization;
 
 namespace GameStore.API.Controllers;
 
+/// <summary>
+/// Controller responsável pelos endpoints de autenticação e registro de usuários.
+/// </summary>
 [ApiController]
 [Route("api/[controller]")]
-public class AuthController : ControllerBase
+[Tags("Auth")]
+[Produces("application/json")]
+public class AuthController : BaseController
 {
-  private readonly IAuthService _authService;
+  private readonly IMediator _mediator;
   private readonly ILogger<AuthController> _logger;
-  private readonly IEncriptService _encriptService;
-  private readonly ITranslationService _translator;
 
-  public AuthController(IAuthService authService, ILogger<AuthController> logger, IEncriptService encriptService, ITranslationService translator)
+  public AuthController(
+    IMediator mediator, 
+    ILogger<AuthController> logger,
+    IStringLocalizer<SharedResource> localizer) : base(localizer)
   {
-    _authService = authService;
+    _mediator = mediator;
     _logger = logger;
-    _encriptService = encriptService;
-    _translator = translator;
   }
 
+  /// <summary>
+  /// Registra um novo usuário no sistema.
+  /// </summary>
+  /// <param name="request">Dados do usuário para registro (nome, email, username e senha).</param>
+  /// <returns>ID do usuário criado em caso de sucesso, ou erros de validação em caso de falha.</returns>
+  /// <response code="200">Registro realizado com sucesso. Retorna o ID do usuário criado.</response>
+  /// <response code="400">Erro de validação dos dados fornecidos. Retorna detalhes dos campos inválidos.</response>
   [HttpPost("register")]
-  public async Task<IActionResult> Register([FromBody] RegisterRequest request)
+  [ProducesResponseType(typeof(object), StatusCodes.Status200OK)]
+  [ProducesResponseType(typeof(ValidationErrorResponse), StatusCodes.Status400BadRequest)]
+  public async Task<ActionResult<Guid?>> Register([FromBody] RegisterUserRequest request)
   {
     _logger.LogInformation("Registration attempt for email: {Email}", request.Email);
 
-    if (string.IsNullOrWhiteSpace(request.Name) ||
-        string.IsNullOrWhiteSpace(request.Email) ||
-        string.IsNullOrWhiteSpace(request.Username) ||
-        string.IsNullOrWhiteSpace(request.Password))
-    {
-      return BadRequest(new { message = _translator.Translate("Auth.Register.AllfieldsAreRequired") });
-    }
-
-    if (request.Password.Length < 8)
-    {
-      return BadRequest(new { message = _translator.Translate("Auth.Register.PasswordMustBeAtLeast8CharactersLong") });
-    }
-
-    var (success, message, userId) = await _authService.RegisterAsync(request);
-    string translatedMessage = _translator.Translate(message);
+    var command = new RegisterUserCommand(request.Name, request.Email, request.Username, request.Password);
+    var response = await _mediator.Send(command);
     
-    if (!success)
+    if (!response.IsSuccess)
     {
-      return BadRequest(new { message = translatedMessage });
+      return ToActionResult(response);
     }
 
-    return Ok(new { message = translatedMessage, userId });
+    return Ok(new { message = TranslatedMessage(response.Message), userId = response.Data });
   }
 
+  /// <summary>
+  /// Realiza login de um usuário no sistema.
+  /// </summary>
+  /// <param name="request">Credenciais de login (identifier pode ser email ou username, e senha).</param>
+  /// <returns>Dados do usuário autenticado com token JWT em caso de sucesso, ou erro em caso de falha.</returns>
+  /// <response code="200">Login realizado com sucesso. Retorna os dados do usuário e o token JWT.</response>
+  /// <response code="401">Credenciais inválidas ou usuário não encontrado.</response>
   [HttpPost("login")]
+  [ProducesResponseType(typeof(object), StatusCodes.Status200OK)]
+  [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status401Unauthorized)]
   public async Task<IActionResult> Login([FromBody] LoginRequest request)
   {
     _logger.LogInformation("Login attempt for identifier: {Identifier}", request.Identifier);
 
-    if (string.IsNullOrWhiteSpace(request.Identifier) || string.IsNullOrWhiteSpace(request.Password))
+    var command = new LoginCommand(request.Identifier, request.Password);
+    var result = await _mediator.Send(command);
+
+    if (!result.IsSuccess || result.Data == null)
     {
-      return BadRequest(new { message = _translator.Translate("Auth.Login.IdentifierAndPasswordAreRequired") });
+      // Para login, erros devem retornar Unauthorized ao invés de BadRequest
+      return Unauthorized(new 
+      { 
+        message = TranslatedMessage(result.Message), 
+        errors = FormatErrors(result)
+      });
     }
 
-    var (success, message, response) = await _authService.LoginAsync(request);
-    string translatedMessage = _translator.Translate(message);
-
-    if (!success || response == null)
-    {
-      return Unauthorized(new { message = translatedMessage });
-    }
-
-    return Ok(new { response, success });
+    return Ok(new { response = result.Data, success = result.IsSuccess });
   }
 
+  /// <summary>
+  /// Envia código de confirmação por email para validar a conta do usuário.
+  /// </summary>
+  /// <param name="request">Email do usuário que receberá o código de confirmação.</param>
+  /// <returns>Mensagem de sucesso ou erro.</returns>
+  /// <response code="200">Código de confirmação enviado com sucesso.</response>
+  /// <response code="400">Erro ao enviar código de confirmação (usuário não encontrado ou email inválido).</response>
   [HttpPost("sendConfirmation")]
-  public async Task<IActionResult> SendConfirmation([FromBody] ValidationNotificationRequest request)
+  [ProducesResponseType(typeof(SuccessResponse), StatusCodes.Status200OK)]
+  [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status400BadRequest)]
+  public async Task<IActionResult> SendConfirmation([FromBody] SendAccountConfirmationRequest request)
   {
     _logger.LogInformation("Confirmation send for email: {Email}", request.Email);
 
-    if (string.IsNullOrWhiteSpace(request.Email))
-        return BadRequest(new { message = _translator.Translate("EmailIsRequired") });
+    var command = new SendAccountConfirmationCommand(request.Email);
+    var result = await _mediator.Send(command);
 
-    var (success, message, response) = await _authService.SendAccountConfirmationAsync(request);
-
-    string translatedMessage = _translator.Translate(message);
-
-    if (!success)
-        return BadRequest(new { message = translatedMessage });
-
-    return Ok(new { message = translatedMessage });
+    return ToActionResult(result);
   }
 
+  /// <summary>
+  /// Valida a conta do usuário usando o código de confirmação enviado por email.
+  /// </summary>
+  /// <param name="Code">Código de confirmação recebido por email (codificado em Base64).</param>
+  /// <returns>Mensagem de sucesso ou erro.</returns>
+  /// <response code="200">Conta validada com sucesso.</response>
+  /// <response code="400">Código inválido, expirado ou conta já validada.</response>
   [HttpGet("validationAccount")]
+  [ProducesResponseType(typeof(SuccessResponse), StatusCodes.Status200OK)]
+  [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status400BadRequest)]
   public async Task<IActionResult> ValidationAccount([FromQuery] string Code)
   {
     _logger.LogInformation("Code for attempt validation: {Code}", Code);
 
-    var decoded = _encriptService.DecodeMaskedCode(Code);
-    if (decoded == null)
-        return BadRequest(new { message = _translator.Translate("AuthService.ValidationAccount.InvalidCode") });
+    var command = new ValidationAccountCommand(Code);
+    var result = await _mediator.Send(command);
 
-        _logger.LogInformation("Email validation attempt for: {Email}", decoded.Value.Email);
-
-    var request = new ValidationAccountRequest(decoded.Value.Email, DateTime.Parse(decoded.Value.Expiration));
-
-    if (string.IsNullOrWhiteSpace(request.Email))
-        return BadRequest(new { message = _translator.Translate("EmailIsRequired") });
-
-    var (success, message, response) = await _authService.ValidationAccountAsync(request);
-
-    string translatedMessage = _translator.Translate(message);
-
-    if (!success)
-        return BadRequest(new { message = translatedMessage });
-
-    return Ok(new { message = translatedMessage });
+    return ToActionResult(result);
   }
 }

@@ -1,11 +1,11 @@
 # FIAP Cloud Games
 
 <p align="center">
-  <img src="https://img.shields.io/badge/.NET-9.0-512BD4?style=for-the-badge&logo=dotnet" alt=".NET 9.0"/>
-  <img src="https://img.shields.io/badge/Entity_Framework-Core-512BD4?style=for-the-badge&logo=microsoft" alt="EF Core"/>
-  <img src="https://img.shields.io/badge/SQLite-Database-003B57?style=for-the-badge&logo=sqlite" alt="SQLite"/>
-  <img src="https://img.shields.io/badge/JWT-Authentication-000000?style=for-the-badge&logo=jsonwebtokens" alt="JWT"/>
-  <img src="https://img.shields.io/badge/xUnit-Testing-5E2D79?style=for-the-badge" alt="xUnit"/>
+  <img src="https://img.shields.io/badge/.NET-9.0-007ACC?style=for-the-badge&logo=dotnet" alt=".NET 9.0"/>
+  <img src="https://img.shields.io/badge/Entity_Framework-Core-1BA1E2?style=for-the-badge&logo=microsoft" alt="EF Core"/>
+  <img src="https://img.shields.io/badge/SQLite-Database-00A4DC?style=for-the-badge&logo=sqlite" alt="SQLite"/>
+  <img src="https://img.shields.io/badge/JWT-Authentication-FF6B35?style=for-the-badge&logo=jsonwebtokens" alt="JWT"/>
+  <img src="https://img.shields.io/badge/xUnit-Testing-A020F0?style=for-the-badge" alt="xUnit"/>
   <a href="https://github.com/thefenixdevs/FIAP-Cloud-Games/releases/latest"><img src="https://img.shields.io/github/v/release/thefenixdevs/FIAP-Cloud-Games?style=for-the-badge&label=Release&logo=github" alt="Release badge"/></a>
   <a href="https://github.com/thefenixdevs/FIAP-Cloud-Games/actions/workflows/ci.yml"><img src="https://img.shields.io/github/actions/workflow/status/thefenixdevs/FIAP-Cloud-Games/ci.yml?style=for-the-badge&label=CI&logo=github" alt="CI badge"/></a>
 </p>
@@ -16,9 +16,13 @@
 - [Origem e Evolução](#origem-e-evolução)
 - [Visão Geral](#visão-geral)
 - [Princípios Arquiteturais](#princípios-arquiteturais)
+- [Padrão CQRS e Organização por Features](#-padrão-cqrs-e-organização-por-features)
+- [ApplicationResult Pattern](#-applicationresult-pattern)
+- [Sistema de Localização](#-sistema-de-localização)
 - [Estrutura de Pastas](#estrutura-de-pastas)
 - [Tecnologias e Ferramentas](#tecnologias-e-ferramentas)
 - [Módulos de Negócio](#módulos-de-negócio)
+- [Camada CrossCutting](#-camada-crosscutting)
 - [Estratégia de Banco de Dados](#estratégia-de-banco-de-dados)
 - [Estratégia de Testes](#estratégia-de-testes)
 - [Como Executar o Projeto](#como-executar-o-projeto)
@@ -38,11 +42,14 @@ A aplicação oferece um ecossistema completo para gerenciamento de catálogos d
 ### 🎯 Objetivos do Projeto
 
 - Demonstrar a aplicação de **Clean Architecture** e **DDD** em ambiente .NET
+- Implementar padrão **CQRS** com Mediator para separação de comandos e consultas
+- Organizar código por **Features** para melhor manutenibilidade
+- Aplicar padrões de design como **Repository**, **Unit of Work**, **Result Pattern** e **Dependency Injection**
 - Implementar autenticação e autorização robustas com **JWT**
-- Aplicar padrões de design como **Repository**, **Unit of Work** e **Dependency Injection**
 - Garantir qualidade através de **testes automatizados** em múltiplas camadas
 - Utilizar **Entity Framework Core** com abordagem Code-First
 - Implementar **logging estruturado** e **rastreabilidade de requisições**
+- Implementar **localização multi-idioma** para suporte internacional
 
 ---
 
@@ -54,17 +61,27 @@ A versão atual representa um refinamento arquitetural significativo, incorporan
 
 - ✅ Migração completa para **.NET 9**
 - ✅ Refatoração para **Clean Architecture** pura
+- ✅ Implementação de **padrão CQRS** com Mediator
+- ✅ Organização por **Features** (Auth, Games, Users)
+- ✅ **FluentValidation** para validações automáticas
+- ✅ **Mapster** para mapeamento de objetos
+- ✅ **ApplicationResult Pattern** para padronização de respostas
+- ✅ **Sistema de localização** multi-idioma (pt-BR, en-US)
+- ✅ **Camada CrossCutting** para concerns transversais
+- ✅ **BaseController** com helpers para padronização
+- ✅ **ExceptionHandlingMiddleware** para tratamento centralizado
 - ✅ Implementação de **políticas de autorização customizadas**
 - ✅ **Middleware de CorrelationId** para rastreabilidade
 - ✅ **Seeding automatizado** de dados iniciais
 - ✅ **Cobertura de testes** expandida (unitários e de integração)
 - ✅ **Logging estruturado** com Serilog
+- ✅ **Módulo de gestão de usuários** para administradores
 
 ---
 
 ## 🔍 Visão Geral
 
-O **FIAP Cloud Games** é estruturado em camadas bem definidas, seguindo os princípios da Clean Architecture:
+O **FIAP Cloud Games** é estruturado em camadas bem definidas, seguindo os princípios da Clean Architecture e padrão CQRS:
 
 ```
 ┌─────────────────────────────────────────────┐
@@ -74,7 +91,7 @@ O **FIAP Cloud Games** é estruturado em camadas bem definidas, seguindo os prin
                  │
 ┌────────────────▼────────────────────────────┐
 │      GameStore.Application (Use Cases)      │
-│     Services, DTOs, Business Logic          │
+│   Commands/Queries, Handlers, Validators    │
 └────────────────┬────────────────────────────┘
                  │
 ┌────────────────▼────────────────────────────┐
@@ -86,16 +103,22 @@ O **FIAP Cloud Games** é estruturado em camadas bem definidas, seguindo os prin
 │   GameStore.Infrastructure (External)       │
 │  Database, Repositories, External Services  │
 └─────────────────────────────────────────────┘
+                 │
+┌────────────────▼────────────────────────────┐
+│   GameStore.CrossCutting (Cross-Cutting)    │
+│  DI, Localization, Logging, Swagger Config  │
+└─────────────────────────────────────────────┘
 ```
 
 ### 📦 Componentes Principais
 
 | Camada | Responsabilidade | Dependências |
 |--------|------------------|--------------|
-| **API** | Apresentação, Controllers, Middlewares | Application, Infrastructure |
-| **Application** | Casos de uso, Serviços de aplicação, DTOs | Domain |
+| **API** | Apresentação, Controllers, Middlewares, Models | Application, Infrastructure, CrossCutting |
+| **Application** | Casos de uso, Commands/Queries, Handlers, Validações | Domain |
 | **Domain** | Entidades, Regras de negócio, Contratos | Nenhuma (núcleo) |
-| **Infrastructure** | Persistência, Repositórios, Seeders | Domain |
+| **Infrastructure** | Persistência, Repositórios, Seeders, Implementações de serviços | Domain |
+| **CrossCutting** | Dependency Injection, Localização, Logging, Swagger | Todas as camadas |
 | **Tests** | Testes unitários e de integração | Todas as camadas |
 
 ---
@@ -123,16 +146,167 @@ O projeto foi construído seguindo princípios sólidos de engenharia de softwar
 - **I**nterface Segregation: Contratos específicos por necessidade
 - **D**ependency Inversion: Dependência de abstrações, não de implementações
 
-### 4. **Separation of Concerns**
+### 4. **CQRS (Command Query Responsibility Segregation)**
+- **Separação de Commands e Queries** para operações de escrita e leitura
+- **Mediator Pattern** para desacoplamento entre Controllers e Handlers
+- **Organização por Features** para agrupar casos de uso relacionados
+- **Pipeline Behaviors** para validação automática e cross-cutting concerns
+
+### 5. **Result Pattern**
+- **ApplicationResult** para padronização de respostas
+- Tratamento consistente de sucesso e falhas
+- Erros organizados por campo para facilitar tratamento no frontend
+- Compatibilidade com diferentes tipos de retorno
+
+### 6. **Separation of Concerns**
 - Lógica de negócio isolada da infraestrutura
-- Validações no domínio
-- DTOs para transferência de dados entre camadas
+- Validações no domínio e através de FluentValidation
+- Requests/Responses para transferência de dados entre camadas
 - Mapeamento explícito de responsabilidades
 
-### 5. **Dependency Injection**
+### 7. **Dependency Injection**
 - Injeção de dependência nativa do .NET
 - Registro modular por camada (`AddApplication()`, `AddInfrastructure()`)
+- Módulos especializados em CrossCutting para organização
 - Gerenciamento automático de ciclo de vida
+
+---
+
+## 🎯 Padrão CQRS e Organização por Features
+
+O projeto implementa o padrão **CQRS (Command Query Responsibility Segregation)** utilizando **Mediator**, organizando o código por **Features** que representam contextos de domínio.
+
+### **Estrutura de uma Feature**
+
+Cada feature é organizada da seguinte forma:
+
+```
+Features/{Feature}/
+├── UseCases/
+│   └── {UseCase}/
+│       ├── {Command/Query}.cs          # Comando ou Query
+│       ├── {Command/Query}Handler.cs   # Handler que processa
+│       ├── {Command/Query}Validator.cs # Validações com FluentValidation
+│       ├── {Request}.cs                # DTO de entrada (API → Handler)
+│       └── {Response}.cs               # DTO de saída (Handler → API)
+├── Mappings/                            # Mapeamentos Mapster (opcional)
+└── Shared/                              # Modelos compartilhados
+```
+
+### **Como Funciona**
+
+1. **Controller** recebe HTTP Request e cria um **Command/Query**
+2. **Controller** envia para **Mediator** via `_mediator.Send(command)`
+3. **Mediator** localiza automaticamente o **Handler** correspondente
+4. **ValidationBehavior** executa validações antes do Handler (pipeline)
+5. **Handler** processa a lógica de negócio e retorna **ApplicationResult**
+6. **Controller** converte **ApplicationResult** em resposta HTTP apropriada
+
+### **Benefícios**
+
+- ✅ **Desacoplamento**: Controllers não conhecem Handlers diretamente
+- ✅ **Organização**: Cada caso de uso em seu próprio namespace
+- ✅ **Testabilidade**: Fácil testar Handlers isoladamente
+- ✅ **Escalabilidade**: Fácil adicionar novos casos de uso sem modificar existentes
+- ✅ **Validação Automática**: Pipeline behavior valida todos os Commands/Queries
+
+### **Exemplo Prático**
+
+```csharp
+// Controller
+[HttpPost("register")]
+public async Task<ActionResult<Guid?>> Register([FromBody] RegisterUserRequest request)
+{
+    var command = new RegisterUserCommand(request.Name, request.Email, request.Username, request.Password);
+    var result = await _mediator.Send(command);
+    return ToActionResult(result);
+}
+
+// Command
+public sealed record RegisterUserCommand(
+    string Name, string Email, string Username, string Password) 
+    : IRequest<ApplicationResult<Guid?>>;
+
+// Handler
+public sealed class RegisterUserCommandHandler : IRequestHandler<RegisterUserCommand, ApplicationResult<Guid?>>
+{
+    // Lógica de negócio aqui
+}
+```
+
+---
+
+## 📊 ApplicationResult Pattern
+
+O projeto utiliza o **Result Pattern** através de `ApplicationResult<T>` para padronizar respostas e tratamento de erros.
+
+### **Características**
+
+- **Tipos de Resultado:**
+  - `ApplicationResult<T>` - Para operações que retornam dados
+  - `ApplicationResult` - Para operações sem retorno de dados
+
+- **Propriedades:**
+  - `IsSuccess` / `IsFailure` - Indica sucesso ou falha
+  - `Message` - Mensagem descritiva
+  - `Data` - Dados retornados (quando aplicável)
+  - `Errors` - Lista de erros (compatibilidade retroativa)
+  - `FieldErrors` - Erros organizados por campo (novo formato)
+
+### **Métodos Estáticos**
+
+```csharp
+// Sucesso
+ApplicationResult<T>.Success(data, message)
+
+// Falha
+ApplicationResult<T>.Failure(message)
+
+// Falha de validação (por campo)
+ApplicationResult<T>.ValidationFailure(fieldErrors, message)
+ApplicationResult<T>.ValidationFailure(fieldName, error, message)
+```
+
+### **Benefícios**
+
+- ✅ **Consistência**: Todas as respostas seguem o mesmo padrão
+- ✅ **Tradução**: Mensagens são traduzidas na camada de apresentação
+- ✅ **Erros por Campo**: Facilita tratamento no frontend
+- ✅ **Type Safety**: Tipagem forte para dados de retorno
+
+---
+
+## 🌍 Sistema de Localização
+
+O projeto implementa um sistema de **localização multi-idioma** suportando **pt-BR** e **en-US**.
+
+### **Como Funciona**
+
+1. **Recursos** armazenados em arquivos `.resx` em `CrossCutting/Resources/`
+2. **Tradução** acontece na camada de **apresentação** (BaseController)
+3. **Chaves** são definidas nos Handlers e validators
+4. **Contexto** da requisição determina o idioma (Accept-Language header)
+
+### **Estrutura**
+
+```
+CrossCutting/Resources/
+├── SharedResource.pt-BR.resx  # Traduções em português
+└── SharedResource.en-US.resx  # Traduções em inglês
+```
+
+### **Uso em Controllers**
+
+```csharp
+public class AuthController : BaseController
+{
+    // Tradução automática via BaseController
+    return BadRequest(new {
+        message = TranslatedMessage(result.Message),
+        errors = FormatErrors(result)
+    });
+}
+```
 
 ---
 
@@ -149,15 +323,23 @@ FIAP-Cloud-Games/
 │
 ├── 🎯 GameStore.API/                   # Camada de Apresentação
 │   ├── Controllers/                    # Endpoints REST
+│   │   ├── BaseController.cs           # Controller base com helpers
 │   │   ├── AuthController.cs           # Autenticação e registro
-│   │   └── GamesController.cs          # CRUD de jogos
+│   │   ├── GamesController.cs          # CRUD de jogos
+│   │   └── UsersController.cs          # CRUD de usuários (Admin)
+│   ├── Models/                         # Modelos de resposta da API
+│   │   └── Responses/
+│   │       ├── ErrorResponse.cs
+│   │       ├── SuccessResponse.cs
+│   │       └── ValidationErrorResponse.cs
 │   ├── Authorization/                  # Políticas de autorização customizadas
 │   │   ├── ConfirmedAdminHandler.cs
 │   │   ├── ConfirmedAdminRequirement.cs
 │   │   ├── ConfirmedCommonUserHandler.cs
 │   │   └── ConfirmedCommonUserRequirement.cs
 │   ├── Middleware/                     # Middlewares customizados
-│   │   └── CorrelationIdMiddleware.cs  # Rastreamento de requisições
+│   │   ├── CorrelationIdMiddleware.cs  # Rastreamento de requisições
+│   │   └── ExceptionHandlingMiddleware.cs  # Tratamento de exceções
 │   ├── Database/                       # Banco de dados SQLite
 │   │   └── gamestore.db
 │   ├── logs/                           # Logs da aplicação (Serilog)
@@ -167,18 +349,43 @@ FIAP-Cloud-Games/
 │   ├── appsettings.json                # Configurações gerais
 │   └── appsettings.Development.json    # Configurações de desenvolvimento
 │
-├── 💼 GameStore.Application/           # Camada de Aplicação
-│   ├── Services/                       # Serviços de aplicação
-│   │   ├── AuthService.cs              # Lógica de autenticação
-│   │   ├── GameService.cs              # Lógica de gestão de jogos
-│   │   ├── JwtService.cs               # Geração e validação de tokens
-│   │   ├── IAuthService.cs
-│   │   ├── IGameService.cs
-│   │   └── IJwtService.cs
-│   ├── DTOs/                           # Data Transfer Objects
-│   │   ├── AuthDTOs.cs                 # DTOs de autenticação
-│   │   └── GameDTOs.cs                 # DTOs de jogos
-│   └── DependencyInjection.cs          # Registro de serviços
+├── 💼 GameStore.Application/           # Camada de Aplicação (CQRS)
+│   ├── Features/                       # Features organizadas por domínio
+│   │   ├── Auth/                       # Módulo de autenticação
+│   │   │   └── UseCases/
+│   │   │       ├── Login/
+│   │   │       ├── RegisterUser/
+│   │   │       ├── SendAccountConfirmation/
+│   │   │       └── ValidationAccount/
+│   │   ├── Games/                      # Módulo de jogos
+│   │   │   ├── Mappings/
+│   │   │   ├── Shared/
+│   │   │   └── UseCases/
+│   │   │       ├── CreateGame/
+│   │   │       ├── DeleteGame/
+│   │   │       ├── GetAllGames/
+│   │   │       ├── GetGameById/
+│   │   │       └── UpdateGame/
+│   │   └── Users/                      # Módulo de usuários
+│   │       ├── Mappings/
+│   │       ├── Shared/
+│   │       └── UseCases/
+│   │           ├── CreateUser/
+│   │           ├── DeleteUser/
+│   │           ├── GetAllUsers/
+│   │           ├── GetUserById/
+│   │           └── UpdateUser/
+│   ├── Common/                         # Componentes comuns
+│   │   ├── Exceptions/
+│   │   ├── Mappings/
+│   │   └── Results/
+│   │       └── ApplicationResult.cs    # Result Pattern
+│   ├── Behaviors/                      # Pipeline behaviors
+│   │   └── ValidationBehavior.cs       # Validação automática
+│   └── Services/                       # Interfaces de serviços
+│       ├── IEmailService.cs
+│       ├── IEncriptService.cs
+│       └── IJwtService.cs
 │
 ├── 🔷 GameStore.Domain/                # Camada de Domínio (Core)
 │   ├── Entities/                       # Entidades de domínio
@@ -213,16 +420,42 @@ FIAP-Cloud-Games/
 │   │   │   └── UserRepository.cs
 │   │   └── Abstractions/
 │   │       └── UnitOfWork.cs
-│   └── DependencyInjection.cs          # Registro de infraestrutura
+│   └── Services/                       # Implementações de serviços
+│       ├── EmailService.cs
+│       ├── EncriptService.cs
+│       └── JwtService.cs
+│
+├── 🔧 GameStore.CrossCutting/          # Camada de Concerns Transversais
+│   ├── DependencyInjection/           # Módulos de DI
+│   │   ├── Application/
+│   │   │   └── ApplicationModule.cs    # Registro de Application
+│   │   ├── Infrastructure/
+│   │   │   └── InfrastructureModule.cs # Registro de Infrastructure
+│   │   ├── AuthModule.cs               # Configuração JWT
+│   │   ├── LoggingModule.cs            # Configuração Serilog
+│   │   └── SwaggerModule.cs             # Configuração Swagger
+│   ├── Localization/                   # Sistema de localização
+│   │   ├── ITranslationService.cs
+│   │   ├── LocalizationDependencyInjection.cs
+│   │   ├── LocalizationSettings.cs
+│   │   └── TranslationService.cs
+│   ├── Resources/                      # Arquivos de recursos
+│   │   ├── SharedResource.en-US.resx
+│   │   └── SharedResource.pt-BR.resx
+│   └── SharedResource.cs               # Classe para localização
 │
 └── 🧪 GameStore.Tests/                 # Camada de Testes
     ├── API/                            # Testes de controllers e middleware
     │   ├── Authorization/
     │   └── Middleware/
-    ├── Application/                    # Testes de serviços
-    │   └── Services/
+    ├── Application/                    # Testes de handlers
+    │   └── Features/
+    │       ├── Auth/
+    │       ├── Games/
+    │       └── Users/
     ├── Infrastructure/                 # Testes de repositórios
     │   └── Repositories/
+    ├── TestUtils/                      # Utilitários de teste
     └── Usings.cs                       # Usings globais para testes
 ```
 
@@ -238,15 +471,19 @@ FIAP-Cloud-Games/
   - Configuração de Swagger/OpenAPI
   - Bootstrapping e configuração de DI
 
-#### **GameStore.Application** (Casos de Uso)
-- **O que faz:** Orquestra a lógica de negócio e coordena operações
-- **Como funciona:** Implementa casos de uso, valida DTOs, aplica regras de negócio e coordena repositórios
+#### **GameStore.Application** (Casos de Uso - CQRS)
+- **O que faz:** Orquestra a lógica de negócio através de Commands e Queries
+- **Como funciona:** Implementa padrão CQRS com Mediator, organizando casos de uso por Features
 - **O que pode conter:**
-  - Serviços de aplicação (AuthService, GameService)
-  - DTOs (RegisterDto, LoginDto, GameDto)
-  - Mapeamento de entidades ↔ DTOs
-  - Validações de entrada
-  - Coordenação de transações (via UnitOfWork)
+  - **Features/** organizadas por domínio (Auth, Games, Users)
+  - **Commands/Queries** para operações de escrita e leitura
+  - **Handlers** que processam Commands/Queries
+  - **Validators** usando FluentValidation
+  - **Requests/Responses** para transferência de dados
+  - **ApplicationResult** para padronização de respostas
+  - **Behaviors** para pipeline (validação automática)
+  - **Mappings** usando Mapster
+  - Interfaces de serviços (implementadas em Infrastructure)
 
 #### **GameStore.Domain** (Núcleo)
 - **O que faz:** Define o modelo de domínio e regras de negócio puras
@@ -261,24 +498,35 @@ FIAP-Cloud-Games/
 
 #### **GameStore.Infrastructure** (Persistência e Serviços Externos)
 - **O que faz:** Implementa detalhes técnicos de infraestrutura
-- **Como funciona:** Implementa repositórios, gerencia banco de dados, seeders
+- **Como funciona:** Implementa repositórios, gerencia banco de dados, seeders e serviços
 - **O que pode conter:**
   - DbContext (Entity Framework Core)
   - Implementações de repositórios
+  - Implementações de serviços (EmailService, JwtService, EncriptService)
   - Configurações Fluent API
   - Migrations
   - Seeders de dados
   - Integrações com serviços externos
 
+#### **GameStore.CrossCutting** (Concerns Transversais)
+- **O que faz:** Centraliza configurações e serviços transversais à aplicação
+- **Como funciona:** Módulos especializados para diferentes aspectos (DI, Localization, Logging, Swagger)
+- **O que pode conter:**
+  - **DependencyInjection/** módulos para registro de serviços por camada
+  - **Localization/** sistema de tradução multi-idioma
+  - **Resources/** arquivos .resx com traduções (pt-BR, en-US)
+  - Configurações compartilhadas entre camadas
+
 #### **GameStore.Tests** (Testes Automatizados)
 - **O que faz:** Garante qualidade e funcionamento correto do sistema
-- **Como funciona:** Testes unitários e de integração usando xUnit, Moq e EF InMemory
+- **Como funciona:** Testes unitários e de integração usando xUnit, NSubstitute, Moq e EF InMemory
 - **O que pode conter:**
-  - Testes de serviços (Application)
+  - Testes de Command/Query Handlers (Application/Features)
+  - Testes de Validators (FluentValidation)
   - Testes de repositórios (Infrastructure)
   - Testes de controllers (API)
   - Testes de middleware
-  - Fixtures e mocks
+  - Fixtures e utilitários de teste (TestUtils)
 
 ---
 
@@ -308,9 +556,10 @@ FIAP-Cloud-Games/
 
 ### **Testes**
 - **xUnit** - Framework de testes unitários
-- **Moq** - Biblioteca de mocking
-- **FluentAssertions** - Asserções expressivas
-- **EF Core InMemory** - Provider em memória para testes
+- **NSubstitute** - Biblioteca principal de mocking (substituição de dependências)
+- **Moq** - Biblioteca alternativa de mocking (usada em alguns testes específicos)
+- **EF Core InMemory** - Provider em memória para testes de integração
+- **coverlet.collector** - Coleta de cobertura de código nos testes
 
 ### **Documentação**
 - **Swagger/OpenAPI** - Documentação interativa da API
@@ -322,9 +571,11 @@ FIAP-Cloud-Games/
 - **PowerShell** - Scripts e automação
 
 ### **Padrões e Bibliotecas**
-- **AutoMapper** (opcional/futuro) - Mapeamento objeto-objeto
-- **FluentValidation** (opcional/futuro) - Validações fluentes
-- **MediatR** (opcional/futuro) - CQRS e mediação
+- **Mediator.Abstractions** - Implementação de CQRS e mediação
+- **FluentValidation** - Validações fluentes e expressivas
+- **FluentValidation.DependencyInjectionExtensions** - Extensões para DI
+- **Mapster** - Mapeamento objeto-objeto de alta performance
+- **Mapster.DependencyInjection** - Extensões para DI do Mapster
 
 ---
 
@@ -335,6 +586,8 @@ FIAP-Cloud-Games/
 #### Funcionalidades
 - ✅ **Registro de usuários** com validação de e-mail único
 - ✅ **Login** com geração de JWT
+- ✅ **Envio de código de confirmação** por email
+- ✅ **Validação de conta** via código de confirmação
 - ✅ **Hashing de senhas** com BCrypt (10 rounds)
 - ✅ **Gestão de perfis**: CommonUser e Admin
 - ✅ **Gestão de status de conta**: Pending, Confirmed, Banned
@@ -344,13 +597,21 @@ FIAP-Cloud-Games/
 - Senhas são sempre hasheadas antes de persistir
 - E-mail e username devem ser únicos
 - JWT expira em 60 minutos (configurável)
+- Códigos de confirmação têm tempo de expiração
 
 #### Entidades Envolvidas
 - `User` (Id, Name, Email, Username, PasswordHash, ProfileType, AccountStatus)
 
-#### Serviços
-- `IAuthService` / `AuthService` - Lógica de autenticação
-- `IJwtService` / `JwtService` - Geração e validação de tokens
+#### Commands e Queries
+- `RegisterUserCommand` - Registrar novo usuário
+- `LoginCommand` - Autenticar usuário e gerar JWT
+- `SendAccountConfirmationCommand` - Enviar código de confirmação
+- `ValidationAccountCommand` - Validar conta com código
+
+#### Serviços Utilizados
+- `IJwtService` - Geração e validação de tokens JWT
+- `IEmailService` - Envio de emails
+- `IEncriptService` - Criptografia de códigos de confirmação
 
 ---
 
@@ -373,24 +634,88 @@ FIAP-Cloud-Games/
 #### Entidades Envolvidas
 - `Game` (Id, Title, Description, Price, Genre, ReleaseDate)
 
-#### Serviços
-- `IGameService` / `GameService` - Lógica de gestão de jogos
+#### Commands e Queries
+- `GetAllGamesQuery` - Listar todos os jogos
+- `GetGameByIdQuery` - Obter jogo por ID
+- `CreateGameCommand` - Criar novo jogo
+- `UpdateGameCommand` - Atualizar jogo existente
+- `DeleteGameCommand` - Excluir jogo
 
 ---
 
-### 3. **Módulo de Rastreabilidade**
+### 3. **Módulo de Gestão de Usuários**
+
+#### Funcionalidades
+- ✅ **Listagem de usuários** (somente Admins confirmados)
+- ✅ **Consulta por ID** (somente Admins confirmados)
+- ✅ **Criação de usuários** (somente Admins confirmados)
+- ✅ **Atualização de usuários** (somente Admins confirmados)
+- ✅ **Exclusão de usuários** (somente Admins confirmados)
+
+#### Regras de Negócio
+- Apenas usuários com `ProfileType.Admin` e `AccountStatus.Confirmed` podem gerenciar usuários
+- Validações de e-mail e username únicos
+- Senhas são sempre hasheadas antes de persistir
+- Não é possível excluir o próprio usuário logado
+
+#### Entidades Envolvidas
+- `User` (Id, Name, Email, Username, PasswordHash, ProfileType, AccountStatus)
+
+#### Commands e Queries
+- `GetAllUsersQuery` - Listar todos os usuários
+- `GetUserByIdQuery` - Obter usuário por ID
+- `CreateUserCommand` - Criar novo usuário
+- `UpdateUserCommand` - Atualizar usuário existente
+- `DeleteUserCommand` - Excluir usuário
+
+---
+
+### 4. **Módulo de Rastreabilidade**
 
 #### Funcionalidades
 - ✅ **CorrelationId** em todas as requisições
 - ✅ **Logging estruturado** com contexto de requisição
 - ✅ **Logs persistidos em arquivo** (rolling daily)
+- ✅ **Tratamento centralizado de exceções** via ExceptionHandlingMiddleware
 
 #### Como Funciona
 1. Middleware `CorrelationIdMiddleware` intercepta requisição
 2. Gera ou extrai `X-Correlation-Id` do header
 3. Injeta no contexto HTTP
 4. Logger inclui CorrelationId em todos os logs
-5. Response retorna o mesmo CorrelationId
+5. `ExceptionHandlingMiddleware` captura exceções e retorna respostas padronizadas
+6. Response retorna o mesmo CorrelationId
+
+---
+
+## 🔧 Camada CrossCutting
+
+A camada **GameStore.CrossCutting** centraliza **concerns transversais** que são utilizados por múltiplas camadas da aplicação. Esta organização facilita a manutenção e evolução desses aspectos compartilhados.
+
+### **Módulos Principais**
+
+#### **1. DependencyInjection**
+Módulos especializados para registro de serviços por camada:
+
+- **ApplicationModule** - Registra Mediator, FluentValidation, Mapster
+- **InfrastructureModule** - Registra DbContext, Repositórios, Seeders, Serviços
+- **AuthModule** - Configura autenticação e autorização JWT
+- **LoggingModule** - Configura Serilog com sinks (Console, File)
+- **SwaggerModule** - Configura Swagger/OpenAPI com segurança JWT
+
+#### **2. Localization**
+Sistema de localização multi-idioma:
+
+- **ITranslationService** / **TranslationService** - Serviço de tradução
+- **LocalizationSettings** - Configurações de idioma padrão
+- **Resources/** - Arquivos `.resx` com traduções (pt-BR, en-US)
+- **SharedResource** - Classe marcadora para localização
+
+#### **3. Benefícios**
+- ✅ **Organização**: Concerns transversais em um único lugar
+- ✅ **Reutilização**: Configurações compartilhadas entre camadas
+- ✅ **Manutenção**: Fácil localizar e atualizar configurações
+- ✅ **Testabilidade**: Fácil mockar serviços transversais em testes
 
 ---
 
@@ -512,9 +837,10 @@ O projeto adota uma estratégia de **pirâmide de testes**, priorizando:
 ### **Frameworks e Bibliotecas**
 
 - **xUnit** - Framework de testes (convenção .NET)
-- **Moq** - Criação de mocks e stubs
-- **FluentAssertions** - Asserções legíveis
+- **NSubstitute** - Biblioteca principal de mocking (Substitute.For<T>)
+- **Moq** - Biblioteca alternativa de mocking (usada em alguns testes específicos)
 - **EF Core InMemory** - Banco em memória para testes de repositório
+- **coverlet.collector** - Coleta de métricas de cobertura de código
 
 ### **Categorias de Testes**
 
@@ -522,25 +848,28 @@ O projeto adota uma estratégia de **pirâmide de testes**, priorizando:
 
 **Objetivo:** Testar componentes isolados sem dependências externas
 
-**Localização:** `GameStore.Tests/Application/Services/`
+**Localização:** `GameStore.Tests/Application/Features/`
 
 **Escopo:**
-- Serviços de aplicação (AuthService, GameService, JwtService)
+- Command/Query Handlers (RegisterUserCommandHandler, LoginCommandHandler, etc.)
+- Validators com FluentValidation
 - Lógica de negócio isolada
 - Validações de entrada
-- Tratamento de erros
+- Tratamento de erros e ApplicationResult
 
 **Exemplo de Cenários:**
-- ✅ `AuthService.RegisterAsync` com e-mail duplicado deve lançar exceção
-- ✅ `AuthService.LoginAsync` com senha incorreta deve retornar null
-- ✅ `JwtService.GenerateToken` deve gerar token válido
-- ✅ `GameService.CreateAsync` sem permissão Admin deve falhar
+- ✅ `RegisterUserCommandHandler` com e-mail duplicado deve retornar ValidationFailure
+- ✅ `LoginCommandHandler` com senha incorreta deve retornar Failure
+- ✅ `CreateGameCommandHandler` sem permissão Admin deve falhar
+- ✅ Validators devem rejeitar dados inválidos antes do Handler
 
 **Técnicas:**
-- **Mocking** de repositórios com Moq
+- **Mocking** de repositórios e serviços com NSubstitute (Substitute.For<T>)
 - **Arrange-Act-Assert** pattern
 - **Testes parametrizados** (Theory/InlineData)
 - **Fixtures** para dados de teste
+- **Verificação de ApplicationResult** (IsSuccess, Message, FieldErrors)
+- **Asserções xUnit** padrão (Assert.True, Assert.Equal, Assert.NotNull)
 
 ---
 
@@ -609,9 +938,9 @@ O projeto adota uma estratégia de **pirâmide de testes**, priorizando:
 
 | Camada | Tipo | Foco | Quantidade Aproximada |
 |--------|------|------|----------------------|
-| Application | Unitário | Serviços, DTOs | ~30 testes |
+| Application | Unitário | Command/Query Handlers, Validators | ~50 testes |
 | Infrastructure | Integração | Repositórios, UoW | ~20 testes |
-| API | Middleware | CorrelationId | ~5 testes |
+| API | Middleware | CorrelationId, Exception Handling | ~8 testes |
 | API | Autorização | Handlers customizados | ~10 testes |
 
 **Meta de Cobertura:** 70%+ de cobertura de código nas camadas críticas (Application e Domain)
@@ -832,6 +1161,8 @@ Localização: `GameStore.API/appsettings.json`
 |--------|----------|-----------|-------------|
 | POST | `/api/auth/register` | Registrar novo usuário | Não requerida |
 | POST | `/api/auth/login` | Autenticar e obter JWT | Não requerida |
+| POST | `/api/auth/sendConfirmation` | Enviar código de confirmação por email | Não requerida |
+| GET | `/api/auth/validationAccount` | Validar conta com código de confirmação | Não requerida |
 
 ### **Jogos**
 
@@ -842,6 +1173,16 @@ Localização: `GameStore.API/appsettings.json`
 | POST | `/api/games` | Criar novo jogo | ConfirmedAdmin |
 | PUT | `/api/games/{id}` | Atualizar jogo | ConfirmedAdmin |
 | DELETE | `/api/games/{id}` | Excluir jogo | ConfirmedAdmin |
+
+### **Usuários**
+
+| Método | Endpoint | Descrição | Autorização |
+|--------|----------|-----------|-------------|
+| GET | `/api/users` | Listar todos os usuários | ConfirmedAdmin |
+| GET | `/api/users/{id}` | Obter usuário por ID | ConfirmedAdmin |
+| POST | `/api/users` | Criar novo usuário | ConfirmedAdmin |
+| PUT | `/api/users/{id}` | Atualizar usuário | ConfirmedAdmin |
+| DELETE | `/api/users/{id}` | Excluir usuário | ConfirmedAdmin |
 
 ---
 

@@ -1,4 +1,4 @@
-﻿namespace GameStore.Application.Services
+namespace GameStore.Application.Services
 {
   public interface IEncriptService
   {
