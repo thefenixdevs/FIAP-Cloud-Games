@@ -1,7 +1,14 @@
-
----
-
 # FIAP Cloud Games
+
+<p align="center">
+  <img src="https://img.shields.io/badge/.NET-9.0-512BD4?style=for-the-badge&logo=dotnet" alt=".NET 9.0"/>
+  <img src="https://img.shields.io/badge/Entity_Framework-Core-512BD4?style=for-the-badge&logo=microsoft" alt="EF Core"/>
+  <img src="https://img.shields.io/badge/SQLite-Database-003B57?style=for-the-badge&logo=sqlite" alt="SQLite"/>
+  <img src="https://img.shields.io/badge/JWT-Authentication-000000?style=for-the-badge&logo=jsonwebtokens" alt="JWT"/>
+  <img src="https://img.shields.io/badge/xUnit-Testing-5E2D79?style=for-the-badge" alt="xUnit"/>
+  <a href="https://github.com/thefenixdevs/FIAP-Cloud-Games/releases/latest"><img src="https://img.shields.io/github/v/release/thefenixdevs/FIAP-Cloud-Games?style=for-the-badge&label=Release&logo=github" alt="Release badge"/></a>
+  <a href="https://github.com/thefenixdevs/FIAP-Cloud-Games/actions/workflows/ci.yml"><img src="https://img.shields.io/github/actions/workflow/status/thefenixdevs/FIAP-Cloud-Games/ci.yml?style=for-the-badge&label=CI&logo=github" alt="CI badge"/></a>
+</p>
 
 Plataforma de gestão de jogos digitais construída em .NET com arquitetura orientada a domínio (Clean Architecture + DDD)
 
