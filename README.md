@@ -58,47 +58,47 @@ Essa separação favorece a testabilidade, manutenibilidade e evolução da apli
 
 ### Runtime / Framework principal
 
-* .NET 9.0 SDK – runtime e framework principal. ([GitHub][1])
-* C# 12 – linguagem utilizada. ([GitHub][1])
-* ASP.NET Core 9.0 – para a API web. ([GitHub][1])
+* .NET 9.0 SDK – runtime e framework principal. 
+* C# 12 – linguagem utilizada. 
+* ASP.NET Core 9.0 – para a API web. 
 
 ### Banco de Dados / ORM
 
-* SQLite – banco relacional leve para desenvolvimento e demonstração. ([GitHub][1])
-* Entity Framework Core 9.0 – ORM para mapeamento objeto-relacional e migrations. ([GitHub][1])
+* SQLite – banco relacional leve para desenvolvimento e demonstração. 
+* Entity Framework Core 9.0 – ORM para mapeamento objeto-relacional e migrations. 
 
 ### Autenticação e Segurança
 
-* JWT (JSON Web Tokens) – autenticação stateless. ([GitHub][1])
-* BCrypt.Net-Next – para hashing seguro de senhas. ([GitHub][1])
-* Microsoft.AspNetCore.Authentication.JwtBearer – middleware de JWT no ASP.NET Core. ([GitHub][1])
+* JWT (JSON Web Tokens) – autenticação stateless. 
+* BCrypt.Net-Next – para hashing seguro de senhas. 
+* Microsoft.AspNetCore.Authentication.JwtBearer – middleware de JWT no ASP.NET Core. 
 
 ### Logging e Observabilidade
 
-* Serilog – logging estruturado. ([GitHub][1])
-* Serilog.AspNetCore, Serilog.Sinks.Console, Serilog.Sinks.File – para integração e armazenamento de logs. ([GitHub][1])
+* Serilog – logging estruturado. 
+* Serilog.AspNetCore, Serilog.Sinks.Console, Serilog.Sinks.File – para integração e armazenamento de logs. 
 
 ### Testes
 
-* xUnit – framework de testes unitários. ([GitHub][1])
-* Moq – biblioteca para mocking / stubbing. ([GitHub][1])
-* FluentAssertions – para assert mais legíveis. ([GitHub][1])
-* EF Core InMemory – provider em memória para testes de persistência. ([GitHub][1])
+* xUnit – framework de testes unitários. 
+* Moq – biblioteca para mocking / stubbing. 
+* FluentAssertions – para assert mais legíveis. 
+* EF Core InMemory – provider em memória para testes de persistência. 
 
 ### Documentação
 
-* Swagger / OpenAPI – para documentação interativa da API. ([GitHub][1])
-* Swashbuckle.AspNetCore – geração automática da documentação. ([GitHub][1])
+* Swagger / OpenAPI – para documentação interativa da API. 
+* Swashbuckle.AspNetCore – geração automática da documentação. 
 
 ### Ferramentas de Desenvolvimento
 
-* Git – controle de versão. ([GitHub][1])
-* Visual Studio / VS Code – IDEs suportadas. ([GitHub][1])
+* Git – controle de versão. 
+* Visual Studio / VS Code – IDEs suportadas. 
 
 ### Padrões de Projeto e Outras Bibliotecas
 
-* Repository, Unit of Work, Dependency Injection – padrões aplicados no projeto. ([GitHub][1])
-* Futuramente/Opção: AutoMapper (mapeamento objeto-objeto), FluentValidation (validações fluentes), MediatR (CQRS/mediador) – conforme README atual do projeto. ([GitHub][1])
+* Repository, Unit of Work, Dependency Injection – padrões aplicados no projeto. 
+* Futuramente/Opção: AutoMapper (mapeamento objeto-objeto), FluentValidation (validações fluentes), MediatR (CQRS/mediador) – conforme README atual do projeto. 
 
 ---
 
@@ -151,17 +151,17 @@ FIAP-Cloud-Games/
 
 **Funcionalidades**
 
-* Registro de novos usuários com validação de e-mail único. ([GitHub][1])
-* Login com geração de token JWT. ([GitHub][1])
-* Hash de senhas utilizando BCrypt. ([GitHub][1])
-* Perfis de usuário: `CommonUser` e `Admin`. ([GitHub][1])
-* Status da conta: `Pending`, `Confirmed`, `Banned`. ([GitHub][1])
+* Registro de novos usuários com validação de e-mail único. 
+* Login com geração de token JWT. 
+* Hash de senhas utilizando BCrypt. 
+* Perfis de usuário: `CommonUser` e `Admin`. 
+* Status da conta: `Pending`, `Confirmed`, `Banned`. 
 
 **Regras de negócio**
 
-* Novos usuários iniciam com `Pending` e não podem acessar funcionalidades protegidas até confirmação. ([GitHub][1])
-* Apenas usuários com status `Confirmed` podem executar operações protegidas. ([GitHub][1])
-* Senhas são hasheadas antes de persistir no banco. ([GitHub][1])
+* Novos usuários iniciam com `Pending` e não podem acessar funcionalidades protegidas até confirmação. 
+* Apenas usuários com status `Confirmed` podem executar operações protegidas. 
+* Senhas são hasheadas antes de persistir no banco. 
 
 **Fluxo típico**
 
@@ -177,18 +177,18 @@ FIAP-Cloud-Games/
 
 **Funcionalidades**
 
-* Listagem de todos os jogos (`GET /api/games`) para usuários confirmados. ([GitHub][1])
-* Obtenção de jogo por ID (`GET /api/games/{id}`). ([GitHub][1])
-* Criação de novo jogo (`POST /api/games`) — somente para usuários com perfil `Admin` e status `Confirmed`. ([GitHub][1])
-* Atualização de jogo (`PUT /api/games/{id}`) — somente Admins. ([GitHub][1])
-* Exclusão de jogo (`DELETE /api/games/{id}`) — somente Admins. ([GitHub][1])
+* Listagem de todos os jogos (`GET /api/games`) para usuários confirmados. 
+* Obtenção de jogo por ID (`GET /api/games/{id}`). 
+* Criação de novo jogo (`POST /api/games`) — somente para usuários com perfil `Admin` e status `Confirmed`. 
+* Atualização de jogo (`PUT /api/games/{id}`) — somente Admins. 
+* Exclusão de jogo (`DELETE /api/games/{id}`) — somente Admins. 
 
 **Regras de negócio**
 
-* Título do jogo é obrigatório. ([GitHub][1])
-* Preço não pode ser negativo. ([GitHub][1])
-* Data de lançamento é opcional. ([GitHub][1])
-* Somente usuários confirmados e com perfil adequado podem operar os endpoints conforme permissão. ([GitHub][1])
+* Título do jogo é obrigatório. 
+* Preço não pode ser negativo. 
+* Data de lançamento é opcional. 
+* Somente usuários confirmados e com perfil adequado podem operar os endpoints conforme permissão. 
 
 **Fluxo típico**
 
@@ -204,9 +204,9 @@ FIAP-Cloud-Games/
 
 **Funcionalidades**
 
-* Interceptação de todas as requisições HTTP por um middleware `CorrelationIdMiddleware`, que garante que cada requisição tenha um `X‐Correlation‐Id` no header. ([GitHub][1])
-* Esse `CorrelationId` é propagado no contexto da aplicação e incluído em todos os logs para rastreabilidade. ([GitHub][1])
-* Logs estruturados com contexto (timestamp, nível, correlation id, mensagem) via Serilog, com output para console e arquivo (rolling daily). ([GitHub][1])
+* Interceptação de todas as requisições HTTP por um middleware `CorrelationIdMiddleware`, que garante que cada requisição tenha um `X‐Correlation‐Id` no header. 
+* Esse `CorrelationId` é propagado no contexto da aplicação e incluído em todos os logs para rastreabilidade. 
+* Logs estruturados com contexto (timestamp, nível, correlation id, mensagem) via Serilog, com output para console e arquivo (rolling daily). 
 
 **Fluxo típico**
 
@@ -222,14 +222,14 @@ FIAP-Cloud-Games/
 
 ### Abordagem: Code-First com Entity Framework Core
 
-* As entidades de domínio são modeladas em C# (ex: `User`, `Game`) e o banco de dados é gerado automaticamente pelas migrations. ([GitHub][1])
-* Banco de dados utilizado: SQLite, via um arquivo local (`gamestore.db`). A escolha se dá por simplicidade de setup e portabilidade em ambiente de desenvolvimento. ([GitHub][1])
-* O sistema de configurações de entidade (Fluent API) está em `GameStore.Infrastructure/Data/Configurations`, permitindo definir chaves primárias, índices únicos (ex: email, username), relacionamentos, restrições, conversão de enums, etc. ([GitHub][1])
+* As entidades de domínio são modeladas em C# (ex: `User`, `Game`) e o banco de dados é gerado automaticamente pelas migrations. 
+* Banco de dados utilizado: SQLite, via um arquivo local (`gamestore.db`). A escolha se dá por simplicidade de setup e portabilidade em ambiente de desenvolvimento. 
+* O sistema de configurações de entidade (Fluent API) está em `GameStore.Infrastructure/Data/Configurations`, permitindo definir chaves primárias, índices únicos (ex: email, username), relacionamentos, restrições, conversão de enums, etc. 
 * Migrations e seeders:
 
-  * Migrations permitem evolução do schema com comandos como `dotnet ef migrations add NomeDaMigracao` e `dotnet ef database update`. ([GitHub][1])
-  * Seeders: a aplicação possui `IDataSeeder`, `DataSeederOrchestrator` e implementações específicas (ex: `UserSeeder`) para popular dados iniciais (como usuário Admin padrão). ([GitHub][1])
-* Padrão Unit of Work (`IUnitOfWork`) e Repository estão implementados para garantir transações explícitas, atomicidade e clareza nas operações de persistência. ([GitHub][1])
+  * Migrations permitem evolução do schema com comandos como `dotnet ef migrations add NomeDaMigracao` e `dotnet ef database update`. 
+  * Seeders: a aplicação possui `IDataSeeder`, `DataSeederOrchestrator` e implementações específicas (ex: `UserSeeder`) para popular dados iniciais (como usuário Admin padrão). 
+* Padrão Unit of Work (`IUnitOfWork`) e Repository estão implementados para garantir transações explícitas, atomicidade e clareza nas operações de persistência. 
 
 ---
 
@@ -237,25 +237,25 @@ FIAP-Cloud-Games/
 
 ### Filosofia de Testes
 
-O projeto adota uma pirâmide de testes clássica: muitos testes unitários, menos testes de integração, e poucos (quando houver) testes end-to-end. ([GitHub][1])
+O projeto adota uma pirâmide de testes clássica: muitos testes unitários, menos testes de integração, e poucos (quando houver) testes end-to-end. 
 
 ### Frameworks / Ferramentas
 
-* xUnit – framework de testes para .NET. ([GitHub][1])
-* Moq – mocking de dependências. ([GitHub][1])
-* FluentAssertions – para assert mais claros. ([GitHub][1])
-* EF Core InMemory – provider para testes de repositório/persistência. ([GitHub][1])
+* xUnit – framework de testes para .NET. 
+* Moq – mocking de dependências. 
+* FluentAssertions – para assert mais claros. 
+* EF Core InMemory – provider para testes de repositório/persistência. 
 
 ### Categorias de Testes
 
-* **Testes Unitários**: localizados em `GameStore.Tests/Application/Services/`. Focam em serviços de aplicação (ex: `AuthService`, `GameService`, `JwtService`) e nas regras de negócio isoladas. Exemplos de cenários: registro com email duplicado, login com senha incorreta, geração de token válida. ([GitHub][1])
-* **Testes de Integração**: localizados em `GameStore.Tests/Infrastructure/Repositories/`. Focam em operações de persistência reais (com o provider InMemory) e verificam comportamentos como persistência correta, consulta por ID, integridade de restrições (ex: índice único de email). ([GitHub][1])
-* **Testes de Middleware / Autorização**: localizados em `GameStore.Tests/API/Middleware/` e `GameStore.Tests/API/Authorization/`. Focam em middlewares (ex: `CorrelationIdMiddleware`) e handlers de autorização customizados (`ConfirmedCommonUserHandler`, `ConfirmedAdminHandler`) para validar headers, claims e perfis de usuário. ([GitHub][1])
+* **Testes Unitários**: localizados em `GameStore.Tests/Application/Services/`. Focam em serviços de aplicação (ex: `AuthService`, `GameService`, `JwtService`) e nas regras de negócio isoladas. Exemplos de cenários: registro com email duplicado, login com senha incorreta, geração de token válida. 
+* **Testes de Integração**: localizados em `GameStore.Tests/Infrastructure/Repositories/`. Focam em operações de persistência reais (com o provider InMemory) e verificam comportamentos como persistência correta, consulta por ID, integridade de restrições (ex: índice único de email). 
+* **Testes de Middleware / Autorização**: localizados em `GameStore.Tests/API/Middleware/` e `GameStore.Tests/API/Authorization/`. Focam em middlewares (ex: `CorrelationIdMiddleware`) e handlers de autorização customizados (`ConfirmedCommonUserHandler`, `ConfirmedAdminHandler`) para validar headers, claims e perfis de usuário. 
 
 ### Cobertura de Testes
 
-* A meta de cobertura é 70% ou mais nas camadas críticas (Application e Domain). ([GitHub][1])
-* Boas práticas adotadas: padrão AAA (Arrange-Act-Assert), testes independentes, nomes descritivos, fixtures reutilizáveis, limpeza automática de contextos. ([GitHub][1])
+* A meta de cobertura é 70% ou mais nas camadas críticas (Application e Domain). 
+* Boas práticas adotadas: padrão AAA (Arrange-Act-Assert), testes independentes, nomes descritivos, fixtures reutilizáveis, limpeza automática de contextos. 
 
 ### Executando os Testes
 
@@ -270,7 +270,7 @@ dotnet test GameStore.sln --logger "console;verbosity=detailed"
 dotnet test /p:CollectCoverage=true /p:CoverletOutputFormat=opencover
 ```
 
-([GitHub][1])
+
 
 ---
 
@@ -278,7 +278,7 @@ dotnet test /p:CollectCoverage=true /p:CoverletOutputFormat=opencover
 
 ### Pré-requisitos
 
-* .NET 9.0 SDK instalado (executar `dotnet --version`, deve retornar algo como 9.0.x) ([GitHub][1])
+* .NET 9.0 SDK instalado (executar `dotnet --version`, deve retornar algo como 9.0.x) 
 * Git instalado
 * Editor de código de sua preferência (Visual Studio 2022, VS Code, Rider)
 
@@ -291,21 +291,21 @@ dotnet test /p:CollectCoverage=true /p:CoverletOutputFormat=opencover
    cd FIAP-Cloud-Games
    ```
 
-   ([GitHub][1])
+   
 2. Restaure as dependências:
 
    ```bash
    dotnet restore GameStore.sln
    ```
 
-   ([GitHub][1])
+   
 3. Aplique as migrations para criar o banco de dados SQLite:
 
    ```bash
    dotnet ef database update --project GameStore.Infrastructure --startup-project GameStore.API
    ```
 
-   Nota: O banco será criado em `GameStore.API/Database/gamestore.db`. ([GitHub][1])
+   Nota: O banco será criado em `GameStore.API/Database/gamestore.db`. 
 4. Execute a API:
 
    ```bash
@@ -319,8 +319,8 @@ dotnet test /p:CollectCoverage=true /p:CoverletOutputFormat=opencover
          Now listening on: https://localhost:7001  
    ```
 
-   ([GitHub][1])
-5. Acesse o Swagger UI em `https://localhost:7001/swagger` para ver a documentação interativa e testar os endpoints. ([GitHub][1])
+   
+5. Acesse o Swagger UI em `https://localhost:7001/swagger` para ver a documentação interativa e testar os endpoints. 
 
 ---
 
@@ -348,7 +348,7 @@ O arquivo de configuração principal está em `GameStore.API/appsettings.json`.
 }
 ```
 
-([GitHub][1])
+
 
 ### Configurações importantes
 
@@ -360,7 +360,7 @@ O arquivo de configuração principal está em `GameStore.API/appsettings.json`.
 | `Jwt:Audience`                        | Audiência/tipo de usuário do token           | `GameStoreApiUsers`                 |
 | `Jwt:ExpirationInMinutes`             | Tempo de expiração do token (em minutos)     | `60`                                |
 
-> ⚠️ Em ambiente de produção, **alterar** `Jwt:SecretKey` para uma chave forte (mínimo 32 caracteres), e utilizar variáveis de ambiente ou serviços de cofre (ex: Azure Key Vault) para gerenciamento seguro de segredos. Também configurar HTTPS com certificado válido. ([GitHub][1])
+> ⚠️ Em ambiente de produção, **alterar** `Jwt:SecretKey` para uma chave forte (mínimo 32 caracteres), e utilizar variáveis de ambiente ou serviços de cofre (ex: Azure Key Vault) para gerenciamento seguro de segredos. Também configurar HTTPS com certificado válido. 
 
 ---
 
@@ -382,20 +382,20 @@ O arquivo de configuração principal está em `GameStore.API/appsettings.json`.
 | POST          | `/api/games`      | Criar novo jogo             | Usuário Admin confirmado    |
 | PUT           | `/api/games/{id}` | Atualizar um jogo existente | Usuário Admin confirmado    |
 | DELETE        | `/api/games/{id}` | Excluir um jogo             | Usuário Admin confirmado    |
-| ([GitHub][1]) |                   |                             |                             |
+|  |                   |                             |                             |
 
 ---
 
 ## Publicação e Releases
 
-* O versionamento segue o semântico e está centralizado no arquivo `Directory.Build.props` (ex: versão `0.2.0`). ([GitHub][1])
-* O arquivo de notas de release está em `RELEASE_NOTES.md`. ([GitHub][1])
-* É configurada uma pipeline CI (ex: `ci.yml`) para builds automáticos, execução de testes e cobertura de código. ([GitHub][1])
+* O versionamento segue o semântico e está centralizado no arquivo `Directory.Build.props` (ex: versão `0.2.0`). 
+* O arquivo de notas de release está em `RELEASE_NOTES.md`. 
+* É configurada uma pipeline CI (ex: `ci.yml`) para builds automáticos, execução de testes e cobertura de código. 
 * Para gerar uma nova release:
 
   1. Garantir branch principal (`master` ou `main`) atualizada.
-  2. Criar tag semântica: `git tag v0.2.0 && git push origin v0.2.0`. ([GitHub][1])
-  3. Workflow publica artefato ZIP e usa notas de release como base. ([GitHub][1])
+  2. Criar tag semântica: `git tag v0.2.0 && git push origin v0.2.0`. 
+  3. Workflow publica artefato ZIP e usa notas de release como base. 
 
 ---
 
@@ -415,7 +415,7 @@ Contribuições são muito bem-vindas! Se você quer melhorar ou estender o proj
 ## Licença
 
 Este projeto está licenciado sob a licença MIT (ver arquivo `LICENSE.txt`).
-([GitHub][1])
+
 
 ---
 
