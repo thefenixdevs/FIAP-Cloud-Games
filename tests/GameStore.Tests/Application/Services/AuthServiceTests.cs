@@ -235,23 +235,6 @@ public class AuthServiceTests
     }
 
     [Fact]
-    public async Task LoginAsync_ShouldReturnFailure_WhenAccountIsPending()
-    {
-        var email = "test@example.com";
-        var request = new LoginRequest(email, "Password123!");
-        var user = CreateUser(email, "testuser", request.Password);
-
-        _userRepositoryMock.Setup(x => x.GetByEmailAsync(email)).ReturnsAsync(user);
-        _passwordHasherMock.Setup(x => x.Verify(user.Password.Hash, request.Password)).Returns(true);
-
-        var result = await _authService.LoginAsync(request);
-
-        Assert.False(result.Success);
-        Assert.Equal("AuthService.LoginAsync.AccountPendingEmailConfirmation", result.Message);
-        Assert.Null(result.Response);
-    }
-
-    [Fact]
     public async Task LoginAsync_ShouldReturnFailure_WhenExceptionOccurs()
     {
         var email = "test@example.com";

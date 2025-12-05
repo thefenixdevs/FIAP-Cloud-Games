@@ -172,9 +172,6 @@
   <data name="AuthService.LoginAsync.InvalidCredentials" xml:space="preserve">
     <value>Invalid credentials</value>
   </data>
-  <data name="AuthService.LoginAsync.AccountPendingEmailConfirmation" xml:space="preserve">
-    <value>Account pending email confirmation</value>
-  </data>
   <data name="AuthService.LoginAsync.AccountIsBlocked" xml:space="preserve">
     <value>Account is blocked</value>
   </data>

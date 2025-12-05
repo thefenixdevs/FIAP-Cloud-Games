@@ -32,30 +32,6 @@ public class AuthorizationHandlerTests
   }
 
   [Fact]
-  public async Task ConfirmedAdminHandler_ShouldFail_WhenUserIsNotConfirmed()
-  {
-    var handler = new ConfirmedAdminHandler();
-    var requirement = new ConfirmedAdminRequirement();
-
-    var claims = new[]
-    {
-            new Claim("ProfileType", "Admin"),
-            new Claim("AccountStatus", "Pending")
-        };
-    var identity = new ClaimsIdentity(claims, "TestAuth");
-    var claimsPrincipal = new ClaimsPrincipal(identity);
-
-    var context = new AuthorizationHandlerContext(
-        new[] { requirement },
-        claimsPrincipal,
-        null);
-
-    await handler.HandleAsync(context);
-
-    Assert.False(context.HasSucceeded);
-  }
-
-  [Fact]
   public async Task ConfirmedAdminHandler_ShouldFail_WhenUserIsNotAdmin()
   {
     var handler = new ConfirmedAdminHandler();
@@ -149,30 +125,6 @@ public class AuthorizationHandlerTests
     await handler.HandleAsync(context);
 
     Assert.True(context.HasSucceeded);
-  }
-
-  [Fact]
-  public async Task ConfirmedCommonUserHandler_ShouldFail_WhenUserIsNotConfirmed()
-  {
-    var handler = new ConfirmedCommonUserHandler();
-    var requirement = new ConfirmedCommonUserRequirement();
-
-    var claims = new[]
-    {
-            new Claim("ProfileType", "CommonUser"),
-            new Claim("AccountStatus", "Pending")
-        };
-    var identity = new ClaimsIdentity(claims, "TestAuth");
-    var claimsPrincipal = new ClaimsPrincipal(identity);
-
-    var context = new AuthorizationHandlerContext(
-        new[] { requirement },
-        claimsPrincipal,
-        null);
-
-    await handler.HandleAsync(context);
-
-    Assert.False(context.HasSucceeded);
   }
 
   [Fact]

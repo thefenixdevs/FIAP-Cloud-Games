@@ -100,9 +100,6 @@ public class AuthService : IAuthService
 
             switch (user.AccountStatus)
             {
-                case AccountStatus.Pending:
-                    _logger.LogWarning("Login failed: Account pending confirmation for identifier {Identifier}", request.Identifier);
-                    return (false, "AuthService.LoginAsync.AccountPendingEmailConfirmation", null);
                 case AccountStatus.Blocked:
                     _logger.LogWarning("Login failed: Account is blocked for identifier {Identifier}", request.Identifier);
                     return (false, "AuthService.LoginAsync.AccountIsBlocked", null);

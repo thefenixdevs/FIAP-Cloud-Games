@@ -162,19 +162,18 @@ FIAP-Cloud-Games/
 * Login com geração de token JWT. 
 * Hash de senhas utilizando BCrypt. 
 * Perfis de usuário: `CommonUser` e `Admin`. 
-* Status da conta: `Pending`, `Confirmed`, `Banned`. 
+* Status da conta: `Active`, `Blocked`, `Banned`. 
 
 **Regras de negócio**
 
-* Novos usuários iniciam com `Pending` e não podem acessar funcionalidades protegidas até confirmação. 
-* Apenas usuários com status `Confirmed` podem executar operações protegidas. 
+* Apenas usuários com status `Active` podem executar operações protegidas. 
 * Senhas são hasheadas antes de persistir no banco. 
 
 **Fluxo típico**
 
 1. Usuário envia requisição `POST /api/auth/register` com email, username e password.
 2. Validação de email/username único.
-3. Password é hasheada e entidade `User` criada com perfil `CommonUser` e status `Pending`.
+3. Password é hasheada e entidade `User` criada com perfil `CommonUser` e status `Active`.
 4. Usuário faz login via `POST /api/auth/login`, recebe token JWT se credenciais válidas.
 5. Em requisições subsequentes a API valida token, verifica claims e aplica políticas de autorização (por exemplo: somente `ConfirmedAdmin` pode criar/editar/excluir jogos).
 
