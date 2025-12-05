@@ -23,7 +23,7 @@ public class UsersController : ControllerBase
     }
 
     [HttpGet("me")]
-    [Authorize(Policy = "ConfirmedAdmin")]
+    [Authorize(Policy = "ConfirmedCommonUser")]
     public async Task<ActionResult<UserResponse>> GetCurrentUser()
     {
         var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
