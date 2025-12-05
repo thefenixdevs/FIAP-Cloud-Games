@@ -7,7 +7,6 @@ using GameStore.Infrastructure.Data.Seeders;
 using GameStore.Infrastructure.Data.Seeders.Abstractions;
 using GameStore.Infrastructure.Data.Seeders.Users;
 using GameStore.Infrastructure.Repositories.Abstractions;
-using GameStore.Infrastructure.Repositories.Games;
 using GameStore.Infrastructure.Repositories.Users;
 using GameStore.Infrastructure.Security;
 using Microsoft.EntityFrameworkCore;
@@ -24,7 +23,6 @@ public static class InfrastructureModule
         options.UseSqlite(configuration.GetConnectionString("DefaultConnection")));
 
     services.AddScoped<IUserRepository, UserRepository>();
-    services.AddScoped<IGameRepository, GameRepository>();
 
     services.AddScoped<IUnitOfWork, UnitOfWork>();
 

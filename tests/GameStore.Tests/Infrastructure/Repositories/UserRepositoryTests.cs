@@ -2,11 +2,9 @@ using GameStore.Domain.Entities;
 using GameStore.Domain.Enums;
 using GameStore.Infrastructure.Data;
 using GameStore.Infrastructure.Repositories.Abstractions;
-using GameStore.Infrastructure.Repositories.Games;
 using GameStore.Infrastructure.Repositories.Users;
 using GameStore.Tests.TestUtils;
 using Microsoft.EntityFrameworkCore;
-using Xunit;
 
 namespace GameStore.Tests.Infrastructure.Repositories;
 
@@ -24,8 +22,7 @@ public class UserRepositoryTests : IDisposable
 
     _context = new GameStoreContext(options);
     _repository = new UserRepository(_context);
-    var gameRepository = new GameRepository(_context);
-    _unitOfWork = new UnitOfWork(_context, _repository, gameRepository);
+    _unitOfWork = new UnitOfWork(_context, _repository);
   }
 
   public void Dispose()

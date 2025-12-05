@@ -1,5 +1,4 @@
 using GameStore.Application.Services;
-using GameStore.Domain.Security;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace GameStore.CrossCutting.DependencyInjection;
@@ -10,7 +9,6 @@ public static class ApplicationModule
   {
     services.AddScoped<IJwtService, JwtService>();
     services.AddScoped<IAuthService, AuthService>();
-    services.AddScoped<IGameService, GameService>();
     services.AddScoped<IUserService, UserService>();
 
     return services;

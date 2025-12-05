@@ -17,15 +17,13 @@ public class UnitOfWork : IUnitOfWork
   private IDbContextTransaction? _transaction;
   private bool _disposed;
 
-  public UnitOfWork(GameStoreContext context, IUserRepository userRepository, IGameRepository gameRepository)
+  public UnitOfWork(GameStoreContext context, IUserRepository userRepository)
   {
     _context = context;
     Users = userRepository;
-    Games = gameRepository;
   }
 
   public IUserRepository Users { get; }
-  public IGameRepository Games { get; }
 
   public Task<int> CommitAsync(CancellationToken cancellationToken = default)
       => _context.SaveChangesAsync(cancellationToken);

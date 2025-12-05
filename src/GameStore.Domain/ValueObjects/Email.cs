@@ -1,4 +1,3 @@
-using System;
 using System.Net.Mail;
 
 namespace GameStore.Domain.ValueObjects;

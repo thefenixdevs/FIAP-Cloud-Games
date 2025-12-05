@@ -6,7 +6,6 @@ namespace GameStore.Infrastructure.Data;
 public class GameStoreContext(DbContextOptions<GameStoreContext> options) : DbContext(options)
 {
   public DbSet<User> Users { get; set; }
-  public DbSet<Game> Games { get; set; }
 
   protected override void OnModelCreating(ModelBuilder modelBuilder)
   {
