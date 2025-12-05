@@ -17,21 +17,20 @@ namespace GameStore.CrossCutting.DependencyInjection;
 
 public static class InfrastructureModule
 {
-  public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
-  {
-    services.AddDbContext<GameStoreContext>(options =>
-        options.UseSqlite(configuration.GetConnectionString("DefaultConnection")));
+    public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
+    {
+        services.AddDbContext<GameStoreContext>(options =>
+            options.UseSqlite(configuration.GetConnectionString("DefaultConnection")));
 
-    services.AddScoped<IUserRepository, UserRepository>();
+        services.AddScoped<IUserRepository, UserRepository>();
 
-    services.AddScoped<IUnitOfWork, UnitOfWork>();
+        services.AddScoped<IUnitOfWork, UnitOfWork>();
 
-    services.AddScoped<IDataSeeder, UserSeeder>();
-    services.AddScoped<DataSeederOrchestrator>();
-    services.AddScoped<IPasswordHasher, BCryptPasswordHasher>();
-    services.AddScoped<IEmailService, EmailService>();
-    services.AddScoped<IEncriptService, EncriptService>();
+        services.AddScoped<IDataSeeder, UserSeeder>();
+        services.AddScoped<DataSeederOrchestrator>();
+        services.AddScoped<IPasswordHasher, BCryptPasswordHasher>();
+        services.AddScoped<IEncriptService, EncriptService>();
 
-    return services;
-  }
+        return services;
+    }
 }
